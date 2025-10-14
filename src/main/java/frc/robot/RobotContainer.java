@@ -37,6 +37,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     configureBindings();
+
+    //Teste para o commit
   }
   private void configureBindings() {
     if(!Robot.isReal()){
