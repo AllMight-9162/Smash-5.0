@@ -1,14 +1,14 @@
 //LimelightHelpers v1.12 (REQUIRES LLOS 2025.0 OR LATER)
 
-package frc.robot.subsystems;
+package frc.Java_Is_AllMight.Sensors;
 
 import edu.wpi.first.networktables.DoubleArrayEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
-import frc.robot.subsystems.LimelightHelpers.LimelightResults;
-import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
+import frc.Java_Is_AllMight.Sensors.LimelightHelpers.LimelightResults;
+import frc.Java_Is_AllMight.Sensors.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
