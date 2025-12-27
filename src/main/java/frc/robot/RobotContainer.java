@@ -34,6 +34,7 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
+
     configureBindings();
   }
   
@@ -56,7 +57,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    
+
   }
 
   public Command getAutonomousCommand() {
