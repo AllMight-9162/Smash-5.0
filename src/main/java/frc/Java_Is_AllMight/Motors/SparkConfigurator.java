@@ -1,6 +1,5 @@
 package frc.Java_Is_AllMight.Motors;
 
-import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;

@@ -57,7 +57,7 @@ public class TurretSubsytem {
         double currentTurretAngle = turretMotor.getEncoder().getPosition();
 
         double output = turretPID.calculate(currentTurretAngle, turretTargetAngle);
-        output = MathUtil.clamp(output, 0.0, 1.0);
+        output = MathUtil.clamp(output, -1.0, 1.0);
 
         turretMotor.set(output);
     } 
