@@ -26,7 +26,7 @@ public class UltrasonicSensor {
     }
     
     //Método Público 
-
+    
     /**
      * @return distância em centimetros ou -1 em caso de falha
     */
