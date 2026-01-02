@@ -241,6 +241,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
       }
       Translation2d inputs = new Translation2d(xInput , yInput);
+      
       if(boostSupplier.getAsBoolean()){
         inputs = SwerveMath.scaleTranslation(inputs, 1);
       }else{
