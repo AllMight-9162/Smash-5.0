@@ -44,12 +44,23 @@ import swervelib.parser.SwerveParser;
  */
 public class SwerveSubsystem extends SubsystemBase {
     // Objeto global da SwerveDrive (Classe YAGSL)
-    SwerveDrive swerveDrive;
-    StructPublisher<Pose2d> poseVisionPublisher = NetworkTableInstance.getDefault().getStructTopic("PoseVision", Pose2d.struct).publish();
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault().getStructTopic("Pose", Pose2d.struct).publish();
+    private final SwerveDrive swerveDrive;
 
-    Translation2d blueReefCenter = new Translation2d(4.5, 4);
-    Translation2d redReefCenter = new Translation2d(13, 4);
+    //Telemtry
+    private final StructPublisher<Pose2d> poseVisionPublisher = 
+      NetworkTableInstance.getDefault()
+        .getStructTopic("PoseVision", Pose2d.struct)
+        .publish();
+
+    private final StructPublisher<Pose2d> posePublisher = 
+      NetworkTableInstance.getDefault()
+        .getStructTopic("Pose", Pose2d.struct)
+        .publish();
+
+    //Constantes 
+    private static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
+    private static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
+
     // Método construtor da classe
     public SwerveSubsystem(File directory) {
         // Seta a telemetria como nível mais alto
@@ -62,7 +73,7 @@ public class SwerveSubsystem extends SubsystemBase {
           throw new RuntimeException(e);
         }
         swerveDrive.setHeadingCorrection(Constants.SwerveConfigs.headingCorrection);
-        swerveDrive.angularVelocityCorrection =  SwerveConfigs.usarCorrecaoDesvioVelocidadeAngular;
+        swerveDrive.angularVelocityCorrection = SwerveConfigs.usarCorrecaoDesvioVelocidadeAngular;
         swerveDrive.angularVelocityCoefficient = SwerveConfigs.coeficienteCorecaoAngVel;
         
         setupPathPlanner();
@@ -73,32 +84,43 @@ public class SwerveSubsystem extends SubsystemBase {
     public void periodic() {
       // Dentro da função periódica atualizamos nossa odometria
       swerveDrive.updateOdometry();
-      LimelightHelpers.SetRobotOrientation("limelight-front",getHeading().getDegrees(),0,0,0,0,0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
-   
-      boolean doRejectUpdate = false;
       posePublisher.set(getPose());
 
+      LimelightHelpers.SetRobotOrientation(
+        "limelight-front",
+        getHeading().getDegrees(),
+        0,0,0,0,0
+      );
+      LimelightHelpers.PoseEstimate mt2 = 
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+   
+      boolean doRejectUpdate = false;
+      
+
   // se nossa velocidade angular for maior que 360 graus por segundo, ignore atualizações de visão
-      if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 180)
-      {
+      if(Math.abs(
+        swerveDrive.getGyro()
+          .getYawAngularVelocity()
+          .in(DegreesPerSecond)
+      ) > 180) {
         doRejectUpdate = true;
       }
-      if(mt2.tagCount == 0)
-      {
+
+      if(mt2.tagCount == 0) {
         doRejectUpdate = true;
       }
-      if(!doRejectUpdate)
-      {
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+      if(!doRejectUpdate) {
+        swerveDrive.setVisionMeasurementStdDevs(
+          VecBuilder.fill(.7,.7,9999999)
+        );
         swerveDrive.addVisionMeasurement(
             mt2.pose,
-            mt2.timestampSeconds);
-            poseVisionPublisher.set(mt2.pose);
+            mt2.timestampSeconds
+        );
+        poseVisionPublisher.set(mt2.pose);
       }
-    
   }
-
+  
       public void setupPathPlanner() {
     // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
@@ -248,10 +270,10 @@ public class SwerveSubsystem extends SubsystemBase {
       }
       Rotation2d targetAngle;
       if(getPose().getX() > 8){
-        targetAngle = getPose().getTranslation().minus(redReefCenter).getAngle();
+        targetAngle = getPose().getTranslation().minus(RED_REEF_CENTER).getAngle();
         
       }else{
-        targetAngle = getPose().getTranslation().minus(blueReefCenter).getAngle();
+        targetAngle = getPose().getTranslation().minus(BLUE_REEF_CENTER).getAngle();
       };
       targetAngle = targetAngle.plus(Rotation2d.k180deg);
       double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), targetAngle.getRadians());
