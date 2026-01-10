@@ -3,6 +3,8 @@ package frc.robot;
 import frc.robot.Constants.Controle;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 
 import java.io.File;
 
@@ -23,9 +25,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final SendableChooser<Command> autoChooser;
+  
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
   private XboxController pilotoSub = new XboxController(Controle.xboxControleSub);
+  
   private ShooterSubsystem shooterSubsystem = new ShooterSubsystem(swerve);
+  private IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private ClimbSubsystem climbSubsystem = new ClimbSubsystem(swerve);
 
   public RobotContainer() {
     swerve.setDefaultCommand(swerve.driveCommandAlinharComJoystick(
@@ -37,7 +43,6 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
-
 
     configureBindings();
   }
@@ -51,17 +56,31 @@ public class RobotContainer {
     () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
     () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
 
-    controleXbox.b().whileTrue(swerve.driveReefAlign(
+    controleXbox.b().whileTrue(swerve.driveAlignToGoal(
     () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
     () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND),
     () -> controleXbox.rightBumper().getAsBoolean()));
+  }
 
-    controleXbox.y().onTrue(Commands.runOnce(
-    () -> swerve.setTranslation(new Translation2d(1,4))));
+  public void init() {
+    intakeSubsystem.Intakeinit();
   }
 
   public void periodic() {
 
+  }
+
+  public void autoInit() {
+    setMotorBrake(true);
+  }
+
+  public void teleOpinit() {
+    climbSubsystem.resetClimb();
+  }
+
+  public void teleOP() {
+    
+    
   }
 
   public Command getAutonomousCommand() {
@@ -70,21 +89,5 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brake) {
     swerve.setMotorBrake(brake);
-  }
-
-  public void autoInit() {
-    setMotorBrake(true);
-  }
-
-  public void teleOpinit() {
-    
-  }
-
-  public void teleOP() {
-    if (pilotoSub.getAButton()){
-      shooterSubsystem.shoot();
-    } else if (pilotoSub.getAButtonReleased()){
-      shooterSubsystem.stop();
-    }
   }
 }

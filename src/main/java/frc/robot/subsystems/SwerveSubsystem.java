@@ -57,6 +57,7 @@ public class SwerveSubsystem extends SubsystemBase {
         .getStructTopic("Pose", Pose2d.struct)
         .publish();
 
+    private double speedMultiplier = 1.0;
     //Constantes 
     private static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
     private static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
@@ -205,9 +206,9 @@ public class SwerveSubsystem extends SubsystemBase {
       }
       Translation2d inputs = new Translation2d(xInput , yInput);
       if(boostSupplier.getAsBoolean()){
-        inputs = SwerveMath.scaleTranslation(inputs, 1);
+        inputs = SwerveMath.scaleTranslation(inputs, 1 * speedMultiplier);
       }else{
-        inputs = SwerveMath.scaleTranslation(inputs, 0.6);
+        inputs = SwerveMath.scaleTranslation(inputs, 0.6 * speedMultiplier);
       }
 
       // Faz o robô se mover
@@ -249,7 +250,7 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public Command driveReefAlign(DoubleSupplier translationX, DoubleSupplier translationY, BooleanSupplier boostSupplier)
+  public Command driveAlignToGoal(DoubleSupplier translationX, DoubleSupplier translationY, BooleanSupplier boostSupplier)
   {
     return run(() -> {
       var alliance = DriverStation.getAlliance();
@@ -264,9 +265,9 @@ public class SwerveSubsystem extends SubsystemBase {
       }
       Translation2d inputs = new Translation2d(xInput , yInput);
       if(boostSupplier.getAsBoolean()){
-        inputs = SwerveMath.scaleTranslation(inputs, 1);
+        inputs = SwerveMath.scaleTranslation(inputs, 1 * speedMultiplier);
       }else{
-        inputs = SwerveMath.scaleTranslation(inputs, 0.6);
+        inputs = SwerveMath.scaleTranslation(inputs, 0.6 * speedMultiplier);
       }
       Rotation2d targetAngle;
       if(getPose().getX() > 8){
@@ -372,5 +373,9 @@ public class SwerveSubsystem extends SubsystemBase {
   public void stopRobot(){
     drive(new Translation2d(0.0 , 0.0), 0, true);
     swerveDrive.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
+  }
+
+  public void setSpeedMultiplier(double multiplier){
+    speedMultiplier = multiplier;
   }
 }

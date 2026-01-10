@@ -98,7 +98,7 @@ public class ShooterSubsystem {
     this.swerve = swerve;
 
     shooterMotor = SparkConfigurator.createSparkMax(
-        9,
+        14,
         MotorType.kBrushless,
         null,
         IdleMode.kCoast,
