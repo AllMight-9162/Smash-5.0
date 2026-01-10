@@ -76,7 +76,6 @@ public class ShooterSubsystem {
   private final SwerveSubsystem swerve;
 
   //Limelight
-  private static final String LIMELIGHT_NAME = "limelight";
   private static final int TARGET_TAG_ID = 21;
 
   //Posição fixa do alvo no campo ajustarrrrrrrrr
@@ -89,6 +88,8 @@ public class ShooterSubsystem {
   //Ajuste distância -> potência
   private static final double DIST_TO_POWER_M = 0.08;
   private static final double DIST_TO_POWER_B = 0.2;
+
+  private static final String LIMELIGHT_NAME = "limelightshooter";
 
   private double shooterPower = 0.0;
 
@@ -155,3 +156,4 @@ public class ShooterSubsystem {
     shooterMotor.set(0.0);
   }
 }
+

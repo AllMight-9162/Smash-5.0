@@ -80,9 +80,7 @@ public class RobotContainer {
     
   }
 
-  public void teleOP(ShooterSubsystem shooterSubsystem) {
-    this.shooterSubsystem = shooterSubsystem;
-
+  public void teleOP() {
     if (pilotoSub.getAButton()){
       shooterSubsystem.shoot();
     } else if (pilotoSub.getAButtonReleased()){
