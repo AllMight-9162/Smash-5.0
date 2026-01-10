@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.Controle;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +24,8 @@ public class RobotContainer {
   private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final SendableChooser<Command> autoChooser;
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
+  private XboxController pilotoSub = new XboxController(Controle.xboxControleSub);
+  private ShooterSubsystem shooterSubsystem = new ShooterSubsystem(swerve);
 
   public RobotContainer() {
     swerve.setDefaultCommand(swerve.driveCommandAlinharComJoystick(
@@ -76,7 +80,13 @@ public class RobotContainer {
     
   }
 
-  public void teleOP() {
-    
+  public void teleOP(ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
+
+    if (pilotoSub.getAButton()){
+      shooterSubsystem.shoot();
+    } else if (pilotoSub.getAButtonReleased()){
+      shooterSubsystem.stop();
+    }
   }
 }

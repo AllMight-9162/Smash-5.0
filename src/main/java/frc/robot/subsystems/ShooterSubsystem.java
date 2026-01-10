@@ -76,7 +76,7 @@ public class ShooterSubsystem {
   private final SwerveSubsystem swerve;
 
   //Limelight
-  private static final String LIMELIGHT_NAME = "turretlimelight";
+  private static final String LIMELIGHT_NAME = "limelight";
   private static final int TARGET_TAG_ID = 21;
 
   //Posição fixa do alvo no campo ajustarrrrrrrrr
@@ -127,8 +127,6 @@ public class ShooterSubsystem {
     shooterPower = distanceToPower(distanceMeters);
     shooterPower = MathUtil.clamp(shooterPower, MIN_POWER, MAX_POWER);
 
-    shooterMotor.set(shooterPower);
-
     SmartDashboard.putBoolean("Shooter/Has Vision", hasVision);
     SmartDashboard.putBoolean("Shooter/Valid Vision", validVision);
     SmartDashboard.putNumber("Shooter/Distance (m)", distanceMeters);
@@ -145,6 +143,11 @@ public class ShooterSubsystem {
     Pose2d robotPose = swerve.getPose();
     Translation2d robotPos = robotPose.getTranslation();
     return robotPos.getDistance(goalPosition);
+  }
+
+  //Liga o shooter
+  public void shoot() {
+    shooterMotor.set(shooterPower);
   }
 
   //Desligar o shooter
