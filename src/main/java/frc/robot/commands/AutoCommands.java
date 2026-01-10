@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants;
 
@@ -14,6 +15,7 @@ public class AutoCommands {
     
 private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 private CommandXboxController controleXbox;
+private ShooterSubsystem shooter = new ShooterSubsystem(swerve);
 
     public AutoCommands(File directory){
 
