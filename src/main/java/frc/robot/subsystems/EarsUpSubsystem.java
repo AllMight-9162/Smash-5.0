@@ -60,7 +60,7 @@ public class EarsUpSubsystem{
 
     private void setPosition(SparkMax motor, double setPosition){
         motor.getClosedLoopController()
-            .setReference(setPosition,
+            .setSetpoint(setPosition,
             com.revrobotics.spark.SparkBase.ControlType.kPosition);
     }
 }

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.Constants;
 
@@ -15,7 +14,6 @@ public class AutoCommands {
     
 private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 private CommandXboxController controleXbox;
-private ShooterSubsystem shooter = new ShooterSubsystem(swerve);
 
     public AutoCommands(File directory){
 
@@ -23,7 +21,7 @@ private ShooterSubsystem shooter = new ShooterSubsystem(swerve);
             () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
             () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)))));
 
-        NamedCommands.registerCommand("DriveAlignToReef", Commands.runOnce(() -> swerve.setDefaultCommand(swerve.driveReefAlign(
+        NamedCommands.registerCommand("DriveAlignToReef", Commands.runOnce(() -> swerve.setDefaultCommand(swerve.driveAlignToGoal(
             () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
             () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND),
             () -> controleXbox.rightBumper().getAsBoolean()))));
