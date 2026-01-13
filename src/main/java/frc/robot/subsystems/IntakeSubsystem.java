@@ -3,35 +3,38 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+
+import frc.Java_Is_AllMight.Control.PIDConfig;
 import frc.Java_Is_AllMight.Motors.SparkConfigurator;
-import edu.wpi.first.wpilibj.Servo;
 
 public class IntakeSubsystem {
 
     private final SparkMax IntakeMotor;
-
-    private final Servo servo1;
-    private final Servo servo2;
+    private final SparkMax IntakeAngulateMotor;
 
     private static final int ID_MOTOR_INTAKE = 15;
     private static final int MOTOR_INTAKE_CURRENT_LIMIT = 40;
-    private static final int ServoPos = 90;
-    
+    private static final PIDConfig MOTOR_INTAKE_PID = new PIDConfig(0.0,0.0,0.0,0.0,0.0);
     public IntakeSubsystem(){
-        servo1 = new Servo(0);
-        servo2 = new Servo(1);
-
+        
         IntakeMotor = SparkConfigurator.createSparkMax(
             ID_MOTOR_INTAKE,
             MotorType.kBrushless,
             null,
             IdleMode.kCoast,
             MOTOR_INTAKE_CURRENT_LIMIT);
+
+        IntakeAngulateMotor = SparkConfigurator.createSparkMax(
+            20, 
+            MotorType.kBrushless, 
+            MOTOR_INTAKE_PID, 
+            IdleMode.kBrake, 
+            MOTOR_INTAKE_CURRENT_LIMIT);
     }
 
     public void Intakeinit(){
-        servo1.setAngle(ServoPos);
-        servo2.setAngle(ServoPos);
+        setPosition(IntakeAngulateMotor, 0);
     }
 
     public void take(){
@@ -40,6 +43,10 @@ public class IntakeSubsystem {
 
     public void stop(){
         IntakeMotor.set(0.0);
+    }
+
+    private void setPosition(SparkMax motor, double setPosition){
+        motor.getClosedLoopController().setSetpoint(setPosition,ControlType.kPosition);
     }
 
 }
