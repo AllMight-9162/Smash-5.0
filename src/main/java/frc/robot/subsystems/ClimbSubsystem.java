@@ -1,86 +1,92 @@
+/*
+ * Subsistema responsável pelo mecanismo de climb (subida do robô).
+ */
 package frc.robot.subsystems;
 
+// Dependências necessárias para o funcionamento do subsistema
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkFlex;
-import frc.Java_Is_AllMight.Motors.SparkConfigurator;
-import frc.Java_Is_AllMight.Control.PIDConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import frc.Java_Is_AllMight.Control.PIDConfig;
+import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 
-public class ClimbSubsystem {
+// Subsistema do mecanismo de climb
+public class ClimbSubsystem extends SubsystemBase {
 
-    // Preparação do climb: deixa lentinho e sobe os ngc
-    public enum ClimbState {
-        IDLE,
-        PREPARE,
-        CLIMBING
-    }
-
-    private static final int MOTOR1_CLIMB_ID = 16;
-    private static final int MOTOR2_CLIMB_ID = 17;
-    private static final PIDConfig MOTOR_CLIMB_PID = new PIDConfig(0,0,0);
-    private static final int MOTOR_CLIMB_CURRENT_LIMIT = 40;
-
-    private ClimbState state = ClimbState.IDLE;
-
-    private final SparkFlex climbMotor;
-    private final SparkFlex climbMotor2;
+    // Motores do sistema de climb
+    private final SparkFlex climbAngulateMotor;
+    private final SparkFlex climbLeftMotor;
+    private final SparkFlex climbRightMotor;
     private final SwerveSubsystem swerve;
 
-    public ClimbSubsystem(SwerveSubsystem swerveSubsystem){
+    private static final int LEFT_MOTOR_CLIMB_ID = 17;
+    private static final int RIGHT_MOTOR_CLIMB_ID = 18;
+    private static final int ANGULATE_MOTOR_CLIMB_ID = 19;
+
+    // Configurações de PID dos motores
+    private static final PIDConfig MOTOR_CLIMB_PID = new PIDConfig(0, 0, 0);
+    private static final PIDConfig ANGULATE_MOTOR_CLIMB_PID = new PIDConfig(0, 0, 0);
+
+    // Limite de corrente dos motores de climb
+    private static final int MOTOR_CLIMB_CURRENT_LIMIT = 40;
+
+    // Construtor do subsistema de climb
+    public ClimbSubsystem(SwerveSubsystem swerveSubsystem) {
         this.swerve = swerveSubsystem;
 
-        climbMotor = SparkConfigurator.createSparkFlex(
-            MOTOR1_CLIMB_ID, 
-            MotorType.kBrushless, 
-            MOTOR_CLIMB_PID, 
-            null,
+        climbLeftMotor = SparkConfigurator.createSparkFlex(
+            LEFT_MOTOR_CLIMB_ID,
+            MotorType.kBrushless,
+            MOTOR_CLIMB_PID,
+            IdleMode.kBrake,
             MOTOR_CLIMB_CURRENT_LIMIT
         );
 
-        climbMotor2 = SparkConfigurator.createSparkFlex(
-            MOTOR2_CLIMB_ID, 
-            MotorType.kBrushless, 
-            MOTOR_CLIMB_PID, 
-            null,
+        climbRightMotor = SparkConfigurator.createSparkFlex(
+            RIGHT_MOTOR_CLIMB_ID,
+            MotorType.kBrushless,
+            MOTOR_CLIMB_PID,
+            IdleMode.kBrake,
             MOTOR_CLIMB_CURRENT_LIMIT
         );
 
+        climbAngulateMotor = SparkConfigurator.createSparkFlex(
+            ANGULATE_MOTOR_CLIMB_ID,
+            MotorType.kBrushless,
+            ANGULATE_MOTOR_CLIMB_PID,
+            IdleMode.kBrake,
+            MOTOR_CLIMB_CURRENT_LIMIT
+        );
     }
 
-    public void toggleClimb(){
-        switch(state){
-            case IDLE -> prepareClimb();
-            case PREPARE -> startClimbing();
-            case CLIMBING -> {}
-        }
-    }
-
-    private void prepareClimb(){
-        state = ClimbState.PREPARE;
+    // Prepara o robô para iniciar o climb
+    public void prepareClimb() {
         swerve.setSpeedMultiplier(0.2);
-        moveArmToClimb();
+        setPosition(climbAngulateMotor, 0.3);
     }
 
-    private void startClimbing(){
-        state = ClimbState.CLIMBING;
-        climbMotor.set(1.0);
+    // Inicia o processo de climb do robô
+    public void startClimbing() {
+        setPosition(climbLeftMotor, 0.2);
+        setPosition(climbRightMotor, 0.2);
     }
 
-    public void resetClimb(){
-        state = ClimbState.IDLE;
+    // Reseta o sistema de climb para a posição inicial
+    public void resetClimb() {
         swerve.setSpeedMultiplier(1.0);
-        climbMotor.set(0);
+        setPosition(climbAngulateMotor, 0);
+        setPosition(climbLeftMotor, 0);
+        setPosition(climbRightMotor, 0);
     }
 
-    private void moveArmToClimb(){
-        climbMotor.set(0.4);
-        climbMotor2.set(0.4);
+    // Define a posição alvo do motor usando controle em malha fechada (PID)
+    private void setPosition(SparkFlex motor, double setPosition) {
+        motor.getClosedLoopController().
+        setSetpoint(setPosition, ControlType.kPosition);
     }
-
-    public ClimbState gState(){
-        return state;
-    }
-
-    
 }
+
 
 

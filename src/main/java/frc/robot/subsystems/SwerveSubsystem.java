@@ -59,8 +59,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private double speedMultiplier = 1.0;
     //Constantes 
-    private static final Translation2d BLUE_REEF_CENTER = new Translation2d(4.5, 4);
-    private static final Translation2d RED_REEF_CENTER = new Translation2d(13, 4);
+    private static final Translation2d BLUE_GOAL_CENTER = new Translation2d(4.6, 4);
+    private static final Translation2d RED_GOAL_CENTER = new Translation2d(11.9, 4);
 
     // Método construtor da classe
     public SwerveSubsystem(File directory) {
@@ -87,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       posePublisher.set(getPose());
 
-      LimelightHelpers.SetRobotOrientation(
+     LimelightHelpers.SetRobotOrientation(
         "limelight-front",
         getHeading().getDegrees(),
         0,0,0,0,0
@@ -271,10 +271,10 @@ public class SwerveSubsystem extends SubsystemBase {
       }
       Rotation2d targetAngle;
       if(getPose().getX() > 8){
-        targetAngle = getPose().getTranslation().minus(RED_REEF_CENTER).getAngle();
+        targetAngle = getPose().getTranslation().minus(RED_GOAL_CENTER).getAngle();
         
       }else{
-        targetAngle = getPose().getTranslation().minus(BLUE_REEF_CENTER).getAngle();
+        targetAngle = getPose().getTranslation().minus(BLUE_GOAL_CENTER).getAngle();
       };
       targetAngle = targetAngle.plus(Rotation2d.k180deg);
       double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), targetAngle.getRadians());
