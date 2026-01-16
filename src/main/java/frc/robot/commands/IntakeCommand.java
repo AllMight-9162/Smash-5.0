@@ -2,15 +2,19 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.RampSubsystem;
 
 public class IntakeCommand extends Command{
 
     private final IntakeSubsystem intake;
+    private final RampSubsystem ramp;
+
     public Boolean intakeativo = false;
 
-    public IntakeCommand(IntakeSubsystem intake) {
+    public IntakeCommand(IntakeSubsystem intake, RampSubsystem ramp) {
         this.intake = intake;
-        addRequirements(intake);
+        this.ramp = ramp;
+        addRequirements(intake, ramp);
     
     }
 
@@ -20,8 +24,10 @@ public class IntakeCommand extends Command{
 
         if(intakeativo){
             intake.take();
+            ramp.take();
         } else {
             intake.stop();
+            ramp.stop();
         }
     }
 

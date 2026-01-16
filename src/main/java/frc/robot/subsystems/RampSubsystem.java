@@ -29,7 +29,7 @@ public class RampSubsystem extends SubsystemBase {
         RampMotor1 = SparkConfigurator.createSparkMax(
             ID_MOTOR_RAMP,
             MotorType.kBrushless,
-            null,
+            MOTOR_RAMP_PID,
             IdleMode.kCoast,
             MOTOR_RAMP_CURRENT_LIMIT
         );
@@ -37,7 +37,7 @@ public class RampSubsystem extends SubsystemBase {
         RampMotor2 = SparkConfigurator.createSparkMax(
             ID_MOTOR_RAMP2,
             MotorType.kBrushless,
-            null,
+            MOTOR_RAMP_PID,
             IdleMode.kBrake,
             MOTOR_RAMP_CURRENT_LIMIT
         );

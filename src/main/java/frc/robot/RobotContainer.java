@@ -1,6 +1,8 @@
 package frc.robot;
 
 import frc.robot.Constants.Controle;
+import frc.robot.commands.ClimbCommand;
+import frc.robot.commands.ShooterCommand;
 import frc.robot.commands.IntakeCommand;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -33,6 +35,9 @@ public class RobotContainer {
   private final XboxController pilotoSub = new XboxController(1);
 
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
+  private final ClimbSubsystem climb = new ClimbSubsystem(swerve);
+  private final RampSubsystem ramp = new RampSubsystem();
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -65,7 +70,13 @@ public class RobotContainer {
     () -> controleXbox.rightBumper().getAsBoolean()));
 
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
-        .onTrue(new IntakeCommand(intake));
+        .onTrue(new IntakeCommand(intake, ramp));
+
+    new JoystickButton(pilotoSub, XboxController.Button.kB.value)
+        .onTrue(new ShooterCommand(shooter, ramp));
+
+    new JoystickButton(pilotoSub, XboxController.Button.kY.value)
+        .onTrue(new ClimbCommand(climb));
   }
 
   public void init() {

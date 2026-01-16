@@ -1,29 +1,25 @@
 package frc.robot.commands;
 
-import java.io.File;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.Constants;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 public class AutoCommands {
-    
-private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-private CommandXboxController controleXbox;
 
-    public AutoCommands(File directory){
+    private final SwerveSubsystem swerve;
+    private final ShooterSubsystem shooter;
+    private final IntakeSubsystem intake;
 
-        NamedCommands.registerCommand("Align 45", Commands.runOnce(() -> swerve.setDefaultCommand(swerve.driveAlign45(
-            () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-            () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)))));
+    public AutoCommands(SwerveSubsystem swerveSubsystem, ShooterSubsystem shooter, IntakeSubsystem intake){
+        this.swerve = swerveSubsystem;
+        this.shooter = shooter;
+        this.intake = intake;
 
-        NamedCommands.registerCommand("DriveAlignToReef", Commands.runOnce(() -> swerve.setDefaultCommand(swerve.driveAlignToGoal(
-            () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-            () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND),
-            () -> controleXbox.rightBumper().getAsBoolean()))));
+        NamedCommands.registerCommand("shoot1", Commands.run(() -> shooter.shoot()));
+        NamedCommands.registerCommand("shoot2", Commands.runEnd(() -> shooter.shoot(), () -> shooter.stop()));
+        NamedCommands.registerCommand("shoot3", Commands.runOnce(() -> shooter.shoot()));
     }
 }
