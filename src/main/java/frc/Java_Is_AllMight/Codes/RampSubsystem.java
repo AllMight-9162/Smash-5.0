@@ -1,6 +1,6 @@
-package frc.robot.subsystems;
+package frc.Java_Is_AllMight.Codes;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+/*import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -54,4 +54,4 @@ public class RampSubsystem extends SubsystemBase {
         RampMotor1.set(0.0);
         RampMotor2.set(0.0);
     }
-}
+}*/

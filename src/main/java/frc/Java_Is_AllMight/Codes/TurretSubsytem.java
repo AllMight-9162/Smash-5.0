@@ -1,5 +1,5 @@
 package frc.Java_Is_AllMight.Codes;
-
+/*
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -69,7 +69,7 @@ import frc.robot.subsystems.SwerveSubsystem;
  * - NÃO misturar tx da Limelight com odometria
  * - NÃO remover o deadband achando que "vai ficar mais preciso"
  * - Se mexer em uma coisa e quebrar tudo, VOLTAP PRO ULTIMO COMMIT Rafael ou Niord ou quem tiver lendo, pelo amor de deus
- */
+ 
 
 public class TurretSubsytem {
   //Harware
@@ -198,4 +198,4 @@ public class TurretSubsytem {
     return motorRotations / ROTATIONS_PER_RADIANS;
   }
 
-}
+}*/

@@ -14,51 +14,90 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import frc.Java_Is_AllMight.Control.PIDConfig;
 import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 
+@SuppressWarnings("unused")
 // Subsistema do mecanismo do intake
 public class IntakeSubsystem extends SubsystemBase {
 
     // Motores do sistema de intake
-    private final SparkMax IntakeMotor;
-    private final SparkMax IntakeAngulateMotor;
+    private final SparkMax leftIntakeMotor;
+    private final SparkMax rightIntakeMotor;
+    private final SparkMax leftAngulateMotor;
+    private final SparkMax rightAngulateMotor;
 
-    private static final int ID_MOTOR_INTAKE = 15; // TEMPORARIO PRA TESTES, LEMBRAR DE MUDARRRRRR
-    private static final int ID_MOTOR_INTAKE_ANGULATE = 16;
-
+    private static final int LEFT_INTAKE_MOTOR_ID = 10; 
+    private static final int RIGHT_INTAKE_MOTOR_ID = 11; 
+    private static final int LEFT_ANGULATE_MOTOR_ID = 12;
+    private static final int RIGHT_ANGULATE_MOTOR_ID = 13;
+    
     // Configuração de PID do motor de angulação
-    private static final PIDConfig MOTOR_INTAKE_PID = new PIDConfig(0.0, 0.0, 0.0);
+    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.0, 0.0, 0.0);
 
-    // Limite de corrente dos motores do intake
-    private static final int MOTOR_INTAKE_CURRENT_LIMIT = 40;
+    // Limite de corrente dos motores
+    private static final int CURRENT_LIMIT = 40;
+
+    // Limite de potencia dos motores
+    private static final double INTAKE_OUT_MIN = -1.0;
+    private static final double INTAKE_OUT_MAX = 1.0;
+    private static final double ANGULATE_OUT_MIN = -0.6;
+    private static final double ANGULATE_OUT_MAX = 0.6;
+
+    // Redução dos motores
+    private static final double INTAKE_GEAR_RATIO = 5;
+    private static final double ANGULATE_GEAR_RATIO = 20;
+
+    // Variavel de controle do estado do intake
+    private boolean intakeativo = false;
 
     // Construtor do subsistema do intake
     public IntakeSubsystem() {
 
-        IntakeMotor = SparkConfigurator.createSparkMax(
-            ID_MOTOR_INTAKE,
+        leftIntakeMotor = SparkConfigurator.createSparkMax(
+            LEFT_INTAKE_MOTOR_ID,
             MotorType.kBrushless,
             null,
             IdleMode.kCoast,
-            MOTOR_INTAKE_CURRENT_LIMIT
+            CURRENT_LIMIT,
+            INTAKE_OUT_MIN,INTAKE_OUT_MAX,
+            INTAKE_GEAR_RATIO
         );
 
-        IntakeAngulateMotor = SparkConfigurator.createSparkMax(
-            ID_MOTOR_INTAKE_ANGULATE,
+        rightIntakeMotor = SparkConfigurator.createSparkMaxFollower(
+            RIGHT_INTAKE_MOTOR_ID,
             MotorType.kBrushless,
-            MOTOR_INTAKE_PID,
+            IdleMode.kCoast,
+            CURRENT_LIMIT,
+            LEFT_INTAKE_MOTOR_ID, true,
+            INTAKE_GEAR_RATIO
+        );
+
+        leftAngulateMotor = SparkConfigurator.createSparkMax(
+            LEFT_ANGULATE_MOTOR_ID,
+            MotorType.kBrushless,
+            ANGULATE_PID ,
             IdleMode.kBrake,
-            MOTOR_INTAKE_CURRENT_LIMIT
+            CURRENT_LIMIT,
+            ANGULATE_OUT_MIN, ANGULATE_OUT_MAX,
+            ANGULATE_GEAR_RATIO
+        );
+
+        rightAngulateMotor = SparkConfigurator.createSparkMaxFollower(
+            RIGHT_ANGULATE_MOTOR_ID,
+            MotorType.kBrushless,
+            IdleMode.kBrake,
+            CURRENT_LIMIT,
+            LEFT_ANGULATE_MOTOR_ID, true,
+            ANGULATE_GEAR_RATIO
         );
     }
 
-    // Posiciona o intake e inicia a coleta
-    public void take() {
-        //angulate(30);
-        IntakeMotor.set(0.55);
-    }
+    public void toggleIntake(){
+        intakeativo = !intakeativo;
 
-    // Para o motor de intake
-    public void stop() {
-        IntakeMotor.set(0.0);
+        if(intakeativo){
+            take();
+        } else {
+            stop();
+        }
     }
 
     // Recolhe o intake para a posição inicial
@@ -67,11 +106,28 @@ public class IntakeSubsystem extends SubsystemBase {
         angulate(0.0);
     }
 
-    // Define a posição alvo do motor de angulação usando controle em malha fechada (PID)
-    private void angulate(double setPosition) {
-       IntakeAngulateMotor
-           .getClosedLoopController()
-           .setSetpoint(setPosition, ControlType.kPosition);
+    // Posiciona o intake e inicia a coleta
+    private void take() {
+        angulate(30.0);
+        leftIntakeMotor.set(0.7);
+
+    }
+
+    // Para o motor de intake
+    private void stop() {
+        leftIntakeMotor.set(0.0);
+    }
+
+
+    // Define a posição alvo em graus do motor de angulação usando controle em malha fechada (PID)
+    private void angulate(double degrees) {
+        leftAngulateMotor.getClosedLoopController()
+        .setSetpoint(degreesToRotations(degrees), ControlType.kPosition);
+    }
+
+    //Retorna um valor em graus em relação a rotaçao
+    private double degreesToRotations(double degrees) {
+    return degrees / 360.0;
     }
 }
 

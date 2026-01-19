@@ -1,17 +1,15 @@
 package frc.robot;
 
 import frc.robot.Constants.Controle;
-import frc.robot.commands.ClimbCommand;
-import frc.robot.commands.ShooterCommand;
-import frc.robot.commands.IntakeCommand;
-
+import frc.robot.commands.SubsystemsCommands.ClimbCommand;
+import frc.robot.commands.SubsystemsCommands.IntakeCommand;
+import frc.robot.commands.SubsystemsCommands.ShooterCommand;
 import edu.wpi.first.wpilibj.XboxController;
 
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.RampSubsystem;
 
 import java.io.File;
 
@@ -36,8 +34,8 @@ public class RobotContainer {
 
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
-  private final ClimbSubsystem climb = new ClimbSubsystem(swerve);
-  private final RampSubsystem ramp = new RampSubsystem();
+  private final ClimbSubsystem climb = new ClimbSubsystem();
+ // private final RampSubsystem ramp = new RampSubsystem();
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -70,10 +68,10 @@ public class RobotContainer {
     () -> controleXbox.rightBumper().getAsBoolean()));
 
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
-        .onTrue(new IntakeCommand(intake, ramp));
+        .onTrue(new IntakeCommand(intake));
 
     new JoystickButton(pilotoSub, XboxController.Button.kB.value)
-        .onTrue(new ShooterCommand(shooter, ramp));
+        .onTrue(new ShooterCommand(shooter));
 
     new JoystickButton(pilotoSub, XboxController.Button.kY.value)
         .onTrue(new ClimbCommand(climb));

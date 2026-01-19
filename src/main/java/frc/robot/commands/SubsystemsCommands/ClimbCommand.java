@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.SubsystemsCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -17,14 +17,7 @@ public class ClimbCommand extends Command{
     @Override
     public void initialize() {
 
-        if(ClimbAtivo == false){
-            climb.prepareClimb();
-            ClimbAtivo = true;
-        } else if (ClimbAtivo == true) {
-            climb.startClimbing();
-        } else {
-            climb.resetClimb();
-        }
+       
     }
 
     @Override

@@ -18,8 +18,5 @@ public class AutoCommands {
         this.shooter = shooter;
         this.intake = intake;
 
-        NamedCommands.registerCommand("shoot1", Commands.run(() -> shooter.shoot()));
-        NamedCommands.registerCommand("shoot2", Commands.runEnd(() -> shooter.shoot(), () -> shooter.stop()));
-        NamedCommands.registerCommand("shoot3", Commands.runOnce(() -> shooter.shoot()));
     }
 }
