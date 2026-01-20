@@ -35,7 +35,7 @@ public class RobotContainer {
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
   private final ClimbSubsystem climb = new ClimbSubsystem();
- // private final RampSubsystem ramp = new RampSubsystem();
+ 
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -71,7 +71,7 @@ public class RobotContainer {
         .onTrue(new IntakeCommand(intake));
 
     new JoystickButton(pilotoSub, XboxController.Button.kB.value)
-        .onTrue(new ShooterCommand(shooter));
+        .whileTrue(new ShooterCommand(shooter, swerve));
 
     new JoystickButton(pilotoSub, XboxController.Button.kY.value)
         .onTrue(new ClimbCommand(climb));

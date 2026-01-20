@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import frc.Java_Is_AllMight.Control.PIDConfig;
 import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 
-@SuppressWarnings("unused")
+
 // Subsistema do mecanismo de climb
 public class ClimbSubsystem extends SubsystemBase {
 
