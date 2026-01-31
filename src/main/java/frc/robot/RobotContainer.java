@@ -75,7 +75,7 @@ public class RobotContainer {
   }
 
   public void teleOpinit() {
-    intake.angulate(0.2);
+    intake.Init();
   }
 
   public void teleOP() {

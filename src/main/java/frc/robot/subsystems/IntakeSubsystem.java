@@ -106,7 +106,7 @@ public class IntakeSubsystem extends SubsystemBase {
         angulate(0.0);
     }
     
-    public void intakeInit(){
+    public void Init(){
         leftAngulateMotor.getEncoder().setPosition(0.0);
         stop();
         angulate(0.2);
@@ -115,7 +115,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // Posiciona o intake e inicia a coleta
     private void take() {
         leftIntakeMotor.set(0.7);
-
     }
 
     // Para o motor de intake
