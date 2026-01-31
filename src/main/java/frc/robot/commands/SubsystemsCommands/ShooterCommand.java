@@ -17,7 +17,7 @@ public class ShooterCommand extends Command{
 
     @Override
     public void initialize() {
-        shooter.toggleShoot();
+        shooter.shoot();
     }
 
     @Override

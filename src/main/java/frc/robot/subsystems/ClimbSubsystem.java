@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -19,11 +20,10 @@ import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 public class ClimbSubsystem extends SubsystemBase {
 
     // Motores do sistema de climb
-    private final SparkFlex leftMotor;
-    private final SparkFlex rightMotor;
+    private final SparkMax Motor;
 
-    private static final int LEFT_MOTOR_ID = 17;
-    private static final int RIGHT_MOTOR_ID = 18;
+    private static final int MOTOR_ID = 15;
+   
 
     // Configurações de PID dos motores
     private static final PIDConfig CLIMB_PID = new PIDConfig(0, 0, 0);
@@ -41,8 +41,8 @@ public class ClimbSubsystem extends SubsystemBase {
     // Construtor do subsistema de climb
     public ClimbSubsystem() {
 
-        leftMotor = SparkConfigurator.createSparkFlex(
-            LEFT_MOTOR_ID,
+        Motor = SparkConfigurator.createSparkMax(
+            MOTOR_ID,
             MotorType.kBrushless,
             CLIMB_PID,
             IdleMode.kBrake,
@@ -51,14 +51,8 @@ public class ClimbSubsystem extends SubsystemBase {
             CLIMB_GEAR_RATIO
         );
 
-        rightMotor = SparkConfigurator.createSparkFlexFollower(
-            RIGHT_MOTOR_ID,
-            MotorType.kBrushless,
-            IdleMode.kBrake,
-            CURRENT_LIMIT,
-            LEFT_MOTOR_ID, true, 
-            CLIMB_GEAR_RATIO
-        );
+        SparkConfigurator.configureRampSparkMax(Motor, 0.1);
+
     }
 
     // Prepara o robô para iniciar o climb
@@ -75,7 +69,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // Define a posição alvo do motor usando controle em malha fechada (PID)
     private void setPosition(double position) {
-        leftMotor.getClosedLoopController().
+        Motor.getClosedLoopController().
         setSetpoint(position, ControlType.kPosition);
     }
 }

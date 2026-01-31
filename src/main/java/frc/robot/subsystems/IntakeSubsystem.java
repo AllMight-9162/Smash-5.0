@@ -24,26 +24,26 @@ public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax leftAngulateMotor;
     private final SparkMax rightAngulateMotor;
 
-    private static final int LEFT_INTAKE_MOTOR_ID = 10; 
-    private static final int RIGHT_INTAKE_MOTOR_ID = 11; 
-    private static final int LEFT_ANGULATE_MOTOR_ID = 12;
-    private static final int RIGHT_ANGULATE_MOTOR_ID = 13;
+    private static final int LEFT_ANGULATE_MOTOR_ID = 9;
+    private static final int RIGHT_ANGULATE_MOTOR_ID = 10;
+    private static final int LEFT_INTAKE_MOTOR_ID = 11; 
+    private static final int RIGHT_INTAKE_MOTOR_ID = 12;
     
     // Configuração de PID do motor de angulação
-    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.0, 0.0, 0.0);
+    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.3, 0.0, 0.0);
 
     // Limite de corrente dos motores
-    private static final int CURRENT_LIMIT = 40;
+    private static final int CURRENT_LIMIT = 120;
 
     // Limite de potencia dos motores
     private static final double INTAKE_OUT_MIN = -1.0;
     private static final double INTAKE_OUT_MAX = 1.0;
-    private static final double ANGULATE_OUT_MIN = -0.6;
-    private static final double ANGULATE_OUT_MAX = 0.6;
+    private static final double ANGULATE_OUT_MIN = -1.0;
+    private static final double ANGULATE_OUT_MAX = 1.0;
 
     // Redução dos motores
-    private static final double INTAKE_GEAR_RATIO = 5;
-    private static final double ANGULATE_GEAR_RATIO = 20;
+    private static final double INTAKE_GEAR_RATIO = 15;
+    private static final double ANGULATE_GEAR_RATIO = 27;
 
     // Variavel de controle do estado do intake
     private boolean intakeativo = false;
@@ -105,10 +105,15 @@ public class IntakeSubsystem extends SubsystemBase {
         stop();
         angulate(0.0);
     }
+    
+    public void intakeInit(){
+        leftAngulateMotor.getEncoder().setPosition(0.0);
+        stop();
+        angulate(0.2);
+    }
 
     // Posiciona o intake e inicia a coleta
     private void take() {
-        angulate(30.0);
         leftIntakeMotor.set(0.7);
 
     }
@@ -118,16 +123,10 @@ public class IntakeSubsystem extends SubsystemBase {
         leftIntakeMotor.set(0.0);
     }
 
-
     // Define a posição alvo em graus do motor de angulação usando controle em malha fechada (PID)
-    private void angulate(double degrees) {
+    private void angulate(double set) {
         leftAngulateMotor.getClosedLoopController()
-        .setSetpoint(degreesToRotations(degrees), ControlType.kPosition);
-    }
-
-    //Retorna um valor em graus em relação a rotaçao
-    private double degreesToRotations(double degrees) {
-    return degrees / 360.0;
+        .setSetpoint(set, ControlType.kPosition);
     }
 }
 

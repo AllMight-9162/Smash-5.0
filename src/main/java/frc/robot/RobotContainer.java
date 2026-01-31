@@ -1,15 +1,10 @@
 package frc.robot;
 
 import frc.robot.Constants.Controle;
-import frc.robot.commands.SubsystemsCommands.ClimbCommand;
 import frc.robot.commands.SubsystemsCommands.IntakeCommand;
-import frc.robot.commands.SubsystemsCommands.ShooterCommand;
 import edu.wpi.first.wpilibj.XboxController;
-
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
 
 import java.io.File;
 
@@ -31,11 +26,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   private final XboxController pilotoSub = new XboxController(1);
-
   private final IntakeSubsystem intake = new IntakeSubsystem();
-  private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
-  private final ClimbSubsystem climb = new ClimbSubsystem();
- // private final RampSubsystem ramp = new RampSubsystem();
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -68,13 +59,8 @@ public class RobotContainer {
     () -> controleXbox.rightBumper().getAsBoolean()));
 
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
-        .onTrue(new IntakeCommand(intake));
+    .whileTrue(new IntakeCommand(intake));
 
-    new JoystickButton(pilotoSub, XboxController.Button.kB.value)
-        .onTrue(new ShooterCommand(shooter));
-
-    new JoystickButton(pilotoSub, XboxController.Button.kY.value)
-        .onTrue(new ClimbCommand(climb));
   }
 
   public void init() {
@@ -86,22 +72,18 @@ public class RobotContainer {
   }
 
   public void autoInit() {
-    setMotorBrake(true);
   }
 
   public void teleOpinit() {
-    
+    intake.angulate(0.2);
   }
 
   public void teleOP() {
-    
+
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
 
-  public void setMotorBrake(boolean brake) {
-    swerve.setMotorBrake(brake);
-  }
 }
