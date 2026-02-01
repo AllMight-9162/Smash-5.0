@@ -58,7 +58,7 @@ public class ShooterSubsystem extends SubsystemBase {
        takeMotor = SparkConfigurator.createSparkMax(
             TAKE_ID,
             MotorType.kBrushless,
-            null,
+            MOTOR_PID,
             IdleMode.kCoast,
             CURRENT_LIMIT,
             OUTPUT_MIN, OUTPUT_MAX,

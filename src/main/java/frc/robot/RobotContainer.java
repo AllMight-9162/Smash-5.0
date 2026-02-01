@@ -31,8 +31,7 @@ public class RobotContainer {
 
   private final XboxController pilotoSub = new XboxController(1);
   private final IntakeSubsystem intake = new IntakeSubsystem();
-  private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
- 
+  private final ShooterSubsystem shooter = new ShooterSubsystem(swerve); 
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
