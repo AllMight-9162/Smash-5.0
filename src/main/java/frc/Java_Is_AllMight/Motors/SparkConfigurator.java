@@ -22,13 +22,14 @@ public class SparkConfigurator {
     int currentLimit,
     double outMin,
     double outMax,
-    double gearRatio
+    double gearRatio,
+    boolean isInverted
     
     ) {
     SparkMax motor = new SparkMax(id, motorType);
     SparkMaxConfig config = new SparkMaxConfig();
     
-    applyCommonConfig(config, pidConfig, idleMode, currentLimit, outMin, outMax, gearRatio);
+    applyCommonConfig(config, pidConfig, idleMode, currentLimit, outMin, outMax, gearRatio, isInverted);
     motor.configure(
       config, 
       ResetMode.kResetSafeParameters, 
@@ -75,18 +76,20 @@ public class SparkConfigurator {
     int currentLimit,
     double outMin,
     double outMax,
-    double gearRatio
+    double gearRatio,
+    boolean isInverted
     ) {
     SparkFlex motor = new SparkFlex(id, motorType);
     SparkFlexConfig config = new SparkFlexConfig();
-
-    applyCommonConfig(config, pidConfig, idleMode, currentLimit, outMin, outMax, gearRatio);
+  
+    applyCommonConfig(config, pidConfig, idleMode, currentLimit, outMin, outMax, gearRatio, isInverted);
     
     motor.configure(
       config,
-      ResetMode.kResetSafeParameters, 
-      PersistMode.kPersistParameters
+      ResetMode.kNoResetSafeParameters,
+      PersistMode.kPersistParameters 
     );
+
     return motor;
   }
 
@@ -101,7 +104,7 @@ public class SparkConfigurator {
   ) {
     SparkFlex motor = new SparkFlex(id, motorType);
     SparkFlexConfig config = new SparkFlexConfig();
-
+    
     applyFollowerConfig(config, idleMode, currentLimit, idFollow, isInverted, gearRatio);
 
     motor.configure(
@@ -127,8 +130,8 @@ public class SparkConfigurator {
     int currentLimit,
     double outMin,
     double outMax,
-    double gearRatio
-
+    double gearRatio,
+   boolean isInverted
   ) {
     
     if(pidConfig != null){
@@ -145,6 +148,8 @@ public class SparkConfigurator {
     config.idleMode(idleMode);
     config.smartCurrentLimit(currentLimit);
 
+    config.inverted(isInverted);
+
     config.encoder.positionConversionFactor(1.0 / gearRatio);
     config.encoder.velocityConversionFactor(1.0 / gearRatio);
   }
@@ -158,7 +163,8 @@ public class SparkConfigurator {
     double gearRatio
   ) {
 
-    applyCommonConfig(config, null, idleMode, currentLimit, 0, 0, gearRatio);
+    applyCommonConfig(config, null, idleMode, currentLimit, 0, 0, gearRatio, false);
     config.follow(idFollow, isInverted);
   }
+
 }

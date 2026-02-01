@@ -190,6 +190,7 @@ public class SwerveSubsystem extends SubsystemBase {
                               DoubleSupplier headingY, BooleanSupplier boostSupplier)
   {
     return run(() -> {
+      swerveDrive.setMotorIdleMode(true);
       var alliance = DriverStation.getAlliance();
       double xInput = translationX.getAsDouble(); 
       double yInput = translationY.getAsDouble();

@@ -24,21 +24,22 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SparkFlex shooterMotor;
     private final SparkMax  takeMotor;
 
+    private static final int TAKE_ID = 13;
     private static final int SHOOTER_ID = 14;
-    private static final int TAKE_ID = 16;
 
-    private static final int CURRENT_LIMIT = 40;
+    private static final int CURRENT_LIMIT = 60;
+    
     private static final PIDConfig MOTOR_PID = new PIDConfig(
         0.00025,  
         0.0,      
         0.0,      
-        1.0 / 5700.0, 
+        0.003, 
         0.0);
 
     private static final double OUTPUT_MIN = -1.0;
     private static final double OUTPUT_MAX = 1.0;
 
-    private static final double RAMP_RATE = 0.3;
+    private static final double RAMP_RATE = 0.15;
     private static final double RPM_TOLERANCE = 120.0;
     private static final double GEAR_RATIO = 1.0;
 
@@ -54,6 +55,17 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem(SwerveSubsystem swerve) {
         this.swerve = swerve;
 
+       takeMotor = SparkConfigurator.createSparkMax(
+            TAKE_ID,
+            MotorType.kBrushless,
+            MOTOR_PID,
+            IdleMode.kCoast,
+            CURRENT_LIMIT,
+            OUTPUT_MIN, OUTPUT_MAX,
+            GEAR_RATIO,
+            false
+           );
+
         shooterMotor = SparkConfigurator.createSparkFlex(
             SHOOTER_ID,
             MotorType.kBrushless,
@@ -61,28 +73,20 @@ public class ShooterSubsystem extends SubsystemBase {
             IdleMode.kCoast,
             CURRENT_LIMIT,
             OUTPUT_MIN, OUTPUT_MAX,
-            GEAR_RATIO
+            GEAR_RATIO,
+            true
         );
-
+        
         SparkConfigurator.configureRampSparkFlex(
             shooterMotor, RAMP_RATE
-        );
+        );     
 
-        takeMotor = SparkConfigurator.createSparkMax(
-            TAKE_ID,
-            MotorType.kBrushless,
-            null,
-            IdleMode.kCoast,
-            CURRENT_LIMIT,
-            OUTPUT_MIN, OUTPUT_MAX,
-            GEAR_RATIO
-        );
-
-        rpmTable.put(1.0, 1800.0);
-        rpmTable.put(2.0, 2300.0);
-        rpmTable.put(3.0, 2800.0);
-        rpmTable.put(4.0, 3500.0);
-        rpmTable.put(5.0, 3900.0);
+        rpmTable.put(0.0, 0.0);
+        rpmTable.put(1.0, 1500.0);
+        rpmTable.put(2.0, 2000.0);
+        rpmTable.put(3.0, 2500.0);
+        rpmTable.put(4.0, 3000.0);
+        rpmTable.put(5.0, 3500.0);
     }
 
     @Override
@@ -91,36 +95,42 @@ public class ShooterSubsystem extends SubsystemBase {
             targetRPM);
         SmartDashboard.putNumber("Shooter/ActualRPM",
             getRPM());
+    
     }
 
-    public void updateTargetRPMFromPose() {
+    public void shoot() {
         double distance = MathUtil.clamp(getDistanceFromHub(), 1.0, 5.0);
 
         targetRPM = rpmTable.get(distance);
 
         shooterMotor.getClosedLoopController()
-            .setSetpoint(targetRPM, ControlType.kVelocity);
+        .setSetpoint(targetRPM, ControlType.kVelocity);
+
+        if (atSpeed()) {
+        take();
+        }
+        
     }
 
-    public void stopShooter() {
+    public void stop() {
         shooterMotor.set(0.0);
-        takeMotor.set(0.0);
+        stopTake();
         targetRPM = 0.0;
     }
 
-    public void take() {
-        takeMotor.set(0.8);
+    private void take() {
+       takeMotor.set(1.0);
     }
 
-    public void stopTake() {
-        takeMotor.set(0.0);
+    private void stopTake() {
+       takeMotor.set(0.0);
     }
 
-    public boolean atSpeed() {
+    private boolean atSpeed() {
         return Math.abs(getRPM() - targetRPM) <= RPM_TOLERANCE;
     }
 
-    public double getRPM() {
+    private double getRPM() {
         return shooterMotor.getEncoder().getVelocity();
     }
 

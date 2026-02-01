@@ -17,22 +17,16 @@ public class ShooterCommand extends Command {
 
     @Override
     public void execute() {
-        shooter.updateTargetRPMFromPose();
-
-        if (shooter.atSpeed()) {
-            shooter.take();
-        } else {
-            shooter.stopTake();
-        }
+        shooter.shoot();
     }
 
     @Override
-    public void end(boolean interrupted) {
-        shooter.stopShooter();
+    public void end(boolean interrupted){
+        shooter.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return false; 
+        return false;
     }
 }

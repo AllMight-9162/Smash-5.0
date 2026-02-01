@@ -17,6 +17,5 @@ public class AutoCommands {
         this.swerve = swerveSubsystem;
         this.shooter = shooter;
         this.intake = intake;
-
     }
 }
