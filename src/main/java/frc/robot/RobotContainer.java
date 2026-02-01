@@ -2,13 +2,18 @@ package frc.robot;
 
 import frc.robot.Constants.Controle;
 import frc.robot.commands.SubsystemsCommands.IntakeCommand;
+import frc.robot.commands.SubsystemsCommands.RetractCommand;
+import frc.robot.commands.SubsystemsCommands.ShooterCommand;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,12 +26,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+
 public class RobotContainer {
   private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final SendableChooser<Command> autoChooser;
 
   private final XboxController pilotoSub = new XboxController(1);
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
+ 
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -61,6 +69,12 @@ public class RobotContainer {
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
     .whileTrue(new IntakeCommand(intake));
 
+    new JoystickButton(pilotoSub, XboxController.Button.kB.value)
+    .whileTrue(new RetractCommand(intake));
+
+    new JoystickButton(pilotoSub, XboxController.Button.kY.value)
+    .whileTrue(new ShooterCommand(shooter));
+
   }
 
   public void init() {
@@ -79,7 +93,7 @@ public class RobotContainer {
   }
 
   public void teleOP() {
-
+  
   }
 
   public Command getAutonomousCommand() {

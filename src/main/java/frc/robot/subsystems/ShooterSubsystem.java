@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
@@ -21,13 +24,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerve;
 
-    private final SparkFlex shooterLeaderMotor;
+    private final SparkFlex shooterMotor;
     private final SparkMax  takeMotor;
 
     private static final int TAKE_ID = 13;
     private static final int SHOOTER_ID = 14;
 
-    private static final int CURRENT_LIMIT = 40;
+    private static final int CURRENT_LIMIT = 60;
     
     private static final PIDConfig MOTOR_PID = new PIDConfig(
         0.00025,  
@@ -39,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double OUTPUT_MIN = -1.0;
     private static final double OUTPUT_MAX = 1.0;
 
-    private static final double RAMP_RATE = 0.3;
+    private static final double RAMP_RATE = 0.15;
     private static final double RPM_TOLERANCE = 120.0;
     private static final double GEAR_RATIO = 1.0;
 
@@ -55,36 +58,38 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem(SwerveSubsystem swerve) {
         this.swerve = swerve;
 
-        takeMotor = SparkConfigurator.createSparkMax(
+       takeMotor = SparkConfigurator.createSparkMax(
             TAKE_ID,
-            MotorType.kBrushed,
+            MotorType.kBrushless,
             null,
             IdleMode.kCoast,
             CURRENT_LIMIT,
             OUTPUT_MIN, OUTPUT_MAX,
-            GEAR_RATIO
-            );
+            GEAR_RATIO,
+            false
+           );
 
-        shooterLeaderMotor = SparkConfigurator.createSparkFlex(
+        shooterMotor = SparkConfigurator.createSparkFlex(
             SHOOTER_ID,
             MotorType.kBrushless,
             MOTOR_PID,
             IdleMode.kCoast,
             CURRENT_LIMIT,
             OUTPUT_MIN, OUTPUT_MAX,
-            GEAR_RATIO
+            GEAR_RATIO,
+            true
         );
-
+        
         SparkConfigurator.configureRampSparkFlex(
-            shooterLeaderMotor, RAMP_RATE
-       );     
+            shooterMotor, RAMP_RATE
+        );     
 
         rpmTable.put(0.0, 0.0);
-        rpmTable.put(1.0, 2000.0);
-        rpmTable.put(2.0, 3000.0);
-        rpmTable.put(3.0, 4000.0);
-        rpmTable.put(4.0, 5000.0);
-        rpmTable.put(5.0, 6000.0);
+        rpmTable.put(1.0, 1500.0);
+        rpmTable.put(2.0, 2000.0);
+        rpmTable.put(3.0, 2500.0);
+        rpmTable.put(4.0, 3000.0);
+        rpmTable.put(5.0, 3500.0);
     }
 
     @Override
@@ -101,14 +106,17 @@ public class ShooterSubsystem extends SubsystemBase {
 
         targetRPM = rpmTable.get(distance);
 
-        shooterLeaderMotor.getClosedLoopController()
-            .setSetpoint(targetRPM, ControlType.kVelocity);
+        shooterMotor.getClosedLoopController()
+        .setSetpoint(targetRPM, ControlType.kVelocity);
+
+        if (atSpeed()) {
+        take();
+        }
         
-         take();
     }
 
-    public void stopShooter() {
-        shooterLeaderMotor.set(0.0);
+    public void stop() {
+        shooterMotor.set(0.0);
         stopTake();
         targetRPM = 0.0;
     }
@@ -126,7 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     private double getRPM() {
-        return shooterLeaderMotor.getEncoder().getVelocity();
+        return shooterMotor.getEncoder().getVelocity();
     }
 
     private double getDistanceFromHub() {

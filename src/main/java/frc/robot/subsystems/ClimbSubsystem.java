@@ -48,7 +48,8 @@ public class ClimbSubsystem extends SubsystemBase {
             IdleMode.kBrake,
             CURRENT_LIMIT,
             OUT_MIN,OUT_MAX,
-            CLIMB_GEAR_RATIO
+            CLIMB_GEAR_RATIO,
+            true
         );
 
         SparkConfigurator.configureRampSparkMax(Motor, 0.1);

@@ -3,6 +3,7 @@
  */
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Dependências necessárias para o funcionamento do subsistema
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,16 +31,16 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final int RIGHT_INTAKE_MOTOR_ID = 12;
     
     // Configuração de PID do motor de angulação
-    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.3, 0.0, 0.0);
+    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.75, 0.0003, 0.0001, 0.0, 0.3);
 
-    // Limite de corrente dos motores
-    private static final int CURRENT_LIMIT = 120;
+    // Limite de corrente dos motoresS
+    private static final int CURRENT_LIMIT = 40;
 
-    // Limite de potencia dos motores
+    // Limite de potencia dos motoresS
     private static final double INTAKE_OUT_MIN = -1.0;
     private static final double INTAKE_OUT_MAX = 1.0;
-    private static final double ANGULATE_OUT_MIN = -1.0;
-    private static final double ANGULATE_OUT_MAX = 1.0;
+    private static final double ANGULATE_OUT_MIN = -0.9;
+    private static final double ANGULATE_OUT_MAX = 0.7;
 
     // Redução dos motores
     private static final double INTAKE_GEAR_RATIO = 15;
@@ -58,7 +59,8 @@ public class IntakeSubsystem extends SubsystemBase {
             IdleMode.kCoast,
             CURRENT_LIMIT,
             INTAKE_OUT_MIN,INTAKE_OUT_MAX,
-            INTAKE_GEAR_RATIO
+            INTAKE_GEAR_RATIO,
+            false
         );
 
         rightIntakeMotor = SparkConfigurator.createSparkMaxFollower(
@@ -77,7 +79,8 @@ public class IntakeSubsystem extends SubsystemBase {
             IdleMode.kBrake,
             CURRENT_LIMIT,
             ANGULATE_OUT_MIN, ANGULATE_OUT_MAX,
-            ANGULATE_GEAR_RATIO
+            ANGULATE_GEAR_RATIO,
+            false
         );
 
         rightAngulateMotor = SparkConfigurator.createSparkMaxFollower(
@@ -85,7 +88,7 @@ public class IntakeSubsystem extends SubsystemBase {
             MotorType.kBrushless,
             IdleMode.kBrake,
             CURRENT_LIMIT,
-            LEFT_ANGULATE_MOTOR_ID, true,
+            LEFT_ANGULATE_MOTOR_ID, false,
             ANGULATE_GEAR_RATIO
         );
     }
@@ -100,6 +103,11 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public void periodic(){
+        double encoder = leftAngulateMotor.getEncoder().getPosition();
+        SmartDashboard.putNumber("encoderIntake", encoder);
+    }
+
     // Recolhe o intake para a posição inicial
     public void retract() {
         stop();
@@ -108,13 +116,14 @@ public class IntakeSubsystem extends SubsystemBase {
     
     public void Init(){
         leftAngulateMotor.getEncoder().setPosition(0.0);
+        angulate(0.3);
         stop();
-        angulate(0.2);
     }
 
     // Posiciona o intake e inicia a coleta
     private void take() {
-        leftIntakeMotor.set(0.7);
+        angulate(0.3);
+        leftIntakeMotor.set(1.0);
     }
 
     // Para o motor de intake
@@ -125,7 +134,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Define a posição alvo em graus do motor de angulação usando controle em malha fechada (PID)
     private void angulate(double set) {
         leftAngulateMotor.getClosedLoopController()
-        .setSetpoint(set, ControlType.kPosition);
+        .setSetpoint(-set, ControlType.kPosition);
     }
 }
 

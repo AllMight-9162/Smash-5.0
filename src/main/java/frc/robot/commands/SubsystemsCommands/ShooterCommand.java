@@ -16,12 +16,17 @@ public class ShooterCommand extends Command{
     }
 
     @Override
-    public void initialize() {
+    public void execute() {
         shooter.shoot();
     }
 
     @Override
+    public void end(boolean interrupted){
+        shooter.stop();
+    }
+
+    @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 }
