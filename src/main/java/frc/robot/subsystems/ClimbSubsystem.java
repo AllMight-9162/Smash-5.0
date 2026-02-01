@@ -1,9 +1,5 @@
-/*
- * Subsistema responsável pelo mecanismo de climb (subida do robô).
- */
 package frc.robot.subsystems;
 
-// Dependências necessárias para o funcionamento do subsistema
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkFlex;

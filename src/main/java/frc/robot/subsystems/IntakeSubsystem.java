@@ -1,10 +1,6 @@
-/*
- * Subsistema responsável pelo mecanismo de intake (coleta de peças)
- */
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// Dependências necessárias para o funcionamento do subsistema
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkMax;

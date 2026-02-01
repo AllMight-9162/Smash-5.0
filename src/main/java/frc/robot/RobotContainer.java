@@ -11,9 +11,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
