@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.StructPublisher;
 //import edu.wpi.first.units.measure.AngularVelocityUnit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,7 +46,7 @@ import swervelib.parser.SwerveParser;
 public class SwerveSubsystem extends SubsystemBase {
     // Objeto global da SwerveDrive (Classe YAGSL)
     private final SwerveDrive swerveDrive;
-
+    
     //Telemtry
     private final StructPublisher<Pose2d> poseVisionPublisher = 
       NetworkTableInstance.getDefault()
@@ -78,7 +79,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.angularVelocityCoefficient = SwerveConfigs.coeficienteCorecaoAngVel;
         
         setupPathPlanner();
-        swerveDrive.stopOdometryThread();
+        //swerveDrive.stopOdometryThread();
     }
     
     @Override
@@ -86,6 +87,9 @@ public class SwerveSubsystem extends SubsystemBase {
       // Dentro da função periódica atualizamos nossa odometria
       swerveDrive.updateOdometry();
       posePublisher.set(getPose());
+      SmartDashboard.putNumber("Pose/X", getPose().getX());
+      SmartDashboard.putNumber("Pose/X", getPose().getY());
+
 
      LimelightHelpers.SetRobotOrientation(
         "limelight-front",
@@ -243,11 +247,11 @@ public class SwerveSubsystem extends SubsystemBase {
       double yInput = Math.pow(translationY.getAsDouble(), 3); 
       double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), Rotation2d.fromDegrees(45).getRadians());
       // Faz o robô se mover
-      swerveDrive.drive(new Translation2d(xInput * swerveDrive.getMaximumChassisVelocity(),
-                                          yInput * swerveDrive.getMaximumChassisVelocity()),
-                        omega,
-                        true,
-                        false);                 
+      swerveDrive.drive(new Translation2d(
+        xInput * swerveDrive.getMaximumChassisVelocity(),
+        yInput * swerveDrive.getMaximumChassisVelocity()),
+        omega,true,
+        false);                 
     });
   }
 

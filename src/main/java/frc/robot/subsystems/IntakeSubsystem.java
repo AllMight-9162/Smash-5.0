@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final double ANGULATE_GEAR_RATIO = 27;
 
     // Variavel de controle do estado do intake
-    private boolean intakeativo = false;
+    private boolean active = false;
 
     // Construtor do subsistema do intake
     public IntakeSubsystem() {
@@ -80,7 +80,7 @@ public class IntakeSubsystem extends SubsystemBase {
             CURRENT_LIMIT,
             ANGULATE_OUT_MIN, ANGULATE_OUT_MAX,
             ANGULATE_GEAR_RATIO,
-            false
+            true
         );
 
         rightAngulateMotor = SparkConfigurator.createSparkMaxFollower(
@@ -94,9 +94,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void toggleIntake(){
-        intakeativo = !intakeativo;
+        active = !active;
 
-        if(intakeativo){
+        if(active){
             take();
         } else {
             stop();
@@ -105,7 +105,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void periodic(){
         double encoder = leftAngulateMotor.getEncoder().getPosition();
-        SmartDashboard.putNumber("encoderIntake", encoder);
+        SmartDashboard.putNumber("Intake position", encoder);
     }
 
     // Recolhe o intake para a posição inicial
@@ -134,7 +134,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Define a posição alvo em graus do motor de angulação usando controle em malha fechada (PID)
     private void angulate(double set) {
         leftAngulateMotor.getClosedLoopController()
-        .setSetpoint(-set, ControlType.kPosition);
+        .setSetpoint(set, ControlType.kPosition);
     }
 }
 

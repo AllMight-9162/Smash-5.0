@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.Controle;
+import frc.robot.commands.AutoCommands;
 import frc.robot.commands.SubsystemsCommands.IntakeCommand;
 import frc.robot.commands.SubsystemsCommands.RetractCommand;
 import frc.robot.commands.SubsystemsCommands.ShooterCommand;
@@ -11,9 +12,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 import java.io.File;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.revrobotics.spark.SparkMax;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,7 +34,8 @@ public class RobotContainer {
   private final XboxController pilotoSub = new XboxController(1);
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
- 
+
+  private final AutoCommands autoCommands = new AutoCommands(swerve, shooter, intake);
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -45,6 +46,8 @@ public class RobotContainer {
       () -> controleXbox.getRightX(),
       () -> controleXbox.getRightY(),
       () -> controleXbox.rightBumper().getAsBoolean()));
+
+      new AutoCommands(swerve, shooter, intake);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -82,14 +85,15 @@ public class RobotContainer {
   }
 
   public void periodic() {
-
+    
   }
 
   public void autoInit() {
+    intake.Init();
   }
 
   public void teleOpinit() {
-    intake.Init();
+    
   }
 
   public void teleOP() {
