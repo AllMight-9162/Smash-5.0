@@ -22,33 +22,34 @@ import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 public class ShooterSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerve;
-
+    private final RampSubsystem ramp;
+   
     private final SparkMax  takerMotor;
     private final SparkFlex shooterMotor;
 
     private static final int TAKE_ID = 13;
     private static final int SHOOTER_ID = 14;
 
-    private static final int CURRENT_LIMIT = 60;
+    private static final int CURRENT_LIMIT = 40;
     
     private static final PIDConfig MOTOR_PID = new PIDConfig(
-        0.00021,  
+        0.00019,  
         0.0,      
         0.0,      
-        0.0026, 
+        0.002, 
         0.0);
 
     private static final double OUTPUT_MIN = -1.0;
     private static final double OUTPUT_MAX = 1.0;
 
-    private static final double RAMP_RATE = 0.2;
+    private static final double RAMP_RATE = 0.1;
     private static final double RPM_TOLERANCE = 100.0;
     private static final double GEAR_RATIO = 1.0;
 
     private double targetRPM = 0.0;
     private double distance = 0.0;
 
-    private static final Translation2d BLUE_HUB = new Translation2d(4.6, 4.0);
+    private static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.035);
     private static final Translation2d RED_HUB = new Translation2d(12.0, 4.0);
 
     private final InterpolatingDoubleTreeMap rpmTable =
@@ -56,6 +57,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public ShooterSubsystem(SwerveSubsystem swerve) {
         this.swerve = swerve;
+        ramp = new RampSubsystem();
 
         takerMotor = SparkConfigurator.createSparkMax(
             TAKE_ID,
@@ -84,48 +86,61 @@ public class ShooterSubsystem extends SubsystemBase {
         );     
 
         rpmTable.put(0.0, 0.0);
-        rpmTable.put(1.0, 1000.0);
-        rpmTable.put(2.0, 1500.0);
-        rpmTable.put(3.0, 2000.0);
-        rpmTable.put(4.0, 2500.0);
-        rpmTable.put(5.0, 3000.0);
-        rpmTable.put(6.0, 3500.0);
-        rpmTable.put(7.0, 4000.0);
+        rpmTable.put(0.5, 2195.0);
+        rpmTable.put(1.0, 2345.0);
+        rpmTable.put(1.5, 2495.0);
+        rpmTable.put(2.0, 2645.0);
+        rpmTable.put(2.5, 2795.0);
+        rpmTable.put(3.0, 2945.0);
+        rpmTable.put(3.5, 3095.0);
+        rpmTable.put(4.0, 3245.0);
+        rpmTable.put(4.5, 3395.0);
+        rpmTable.put(5.0, 3545.0);
+        rpmTable.put(5.5, 3695.0);
+        rpmTable.put(6.0, 3845.0);
     }
 
     @Override
     public void periodic() {
         double rawDistance = getDistanceFromHub();
-        distance = MathUtil.clamp(rawDistance, 0.0, 7.0);
+        distance = MathUtil.clamp(rawDistance, 0.0, 6.0);
 
-        SmartDashboard.putNumber("Shooter/Distance RAW", rawDistance);
-        SmartDashboard.putNumber("Shooter/Distance CLAMPED", distance);
-
+        SmartDashboard.putNumber("Shooter/Distance",
+            distance);
         SmartDashboard.putNumber("Shooter/TargetRPM",
             targetRPM);
         SmartDashboard.putNumber("Shooter/ActualRPM",
             getRPM());
         SmartDashboard.putBoolean("At speed", 
             atSpeed());
-    
     }
 
-    public void shoot() {
+    public void shootInField(){
+        targetRPM = 1500;
+        shoot();
+    }
 
+    public void shootInHub(){
         targetRPM = rpmTable.get(distance);
-
-        shooterMotor.getClosedLoopController()
-        .setSetpoint(targetRPM, ControlType.kVelocity);
-
-        if (atSpeed()) {
-         takerMotor.set(1.0);
-        } 
+        shoot();
     }
 
     public void stop() {
         targetRPM = 0.0;
         shooterMotor.set(0.0);
         takerMotor.set(0.0);
+        ramp.stop();
+    }
+
+    private void shoot() {
+
+        shooterMotor.getClosedLoopController()
+        .setSetpoint(targetRPM, ControlType.kVelocity);
+        ramp.set(0.6);
+
+        if (atSpeed()) {
+         takerMotor.set(0.9);
+        } 
     }
 
     private boolean atSpeed() {

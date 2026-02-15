@@ -60,8 +60,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private double speedMultiplier = 1.0;
     //Constantes 
-    private static final Translation2d BLUE_GOAL_CENTER = new Translation2d(4.6, 4);
-    private static final Translation2d RED_GOAL_CENTER = new Translation2d(11.9, 4);
+    private static final Translation2d BLUE_GOAL_CENTER = new Translation2d(4.625, 4.035);
+    private static final Translation2d RED_GOAL_CENTER = new Translation2d(12, 4);
 
     // Método construtor da classe
     public SwerveSubsystem(File directory) {
@@ -191,7 +191,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   //Movimenta o robô com o joystick esquerdo, e mira o robo no ângulo no qual o joystick está apontando
   public Command driveCommandAlinharComJoystick(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier headingX,
-                              DoubleSupplier headingY, BooleanSupplier boostSupplier)
+                              DoubleSupplier headingY, BooleanSupplier boostSupplier, BooleanSupplier lowSupplier)
   {
     return run(() -> {
       swerveDrive.setMotorIdleMode(true);
@@ -211,7 +211,9 @@ public class SwerveSubsystem extends SubsystemBase {
       }
       Translation2d inputs = new Translation2d(xInput , yInput);
       if(boostSupplier.getAsBoolean()){
-        inputs = SwerveMath.scaleTranslation(inputs, 1 * speedMultiplier);
+        inputs = SwerveMath.scaleTranslation(inputs, 1.0 * speedMultiplier);
+      }else if(lowSupplier.getAsBoolean()){
+        inputs = SwerveMath.scaleTranslation(inputs, 0.3 * speedMultiplier);
       }else{
         inputs = SwerveMath.scaleTranslation(inputs, 0.6 * speedMultiplier);
       }
@@ -240,12 +242,12 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public Command driveAlign45(DoubleSupplier translationX, DoubleSupplier translationY)
+  public Command driveAlign180(DoubleSupplier translationX, DoubleSupplier translationY)
   {
     return run(() -> {
       double xInput = Math.pow(translationX.getAsDouble(), 3); 
       double yInput = Math.pow(translationY.getAsDouble(), 3); 
-      double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), Rotation2d.fromDegrees(45).getRadians());
+      double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), Rotation2d.fromDegrees(180).getRadians());
       // Faz o robô se mover
       swerveDrive.drive(new Translation2d(
         xInput * swerveDrive.getMaximumChassisVelocity(),
@@ -255,8 +257,22 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public Command driveAlignToGoal(DoubleSupplier translationX, DoubleSupplier translationY, BooleanSupplier boostSupplier)
+  public Command driveAlign0(DoubleSupplier translationX, DoubleSupplier translationY)
   {
+    return run(() -> {
+      double xInput = Math.pow(translationX.getAsDouble(), 3); 
+      double yInput = Math.pow(translationY.getAsDouble(), 3); 
+      double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), Rotation2d.fromDegrees(0).getRadians());
+      // Faz o robô se mover
+      swerveDrive.drive(new Translation2d(
+        xInput * swerveDrive.getMaximumChassisVelocity(),
+        yInput * swerveDrive.getMaximumChassisVelocity()),
+        omega,true,
+        false);                 
+    });
+  }
+
+  public Command driveAlignToHub(DoubleSupplier translationX, DoubleSupplier translationY){
     return run(() -> {
       var alliance = DriverStation.getAlliance();
       double xInput = translationX.getAsDouble(); 
@@ -268,12 +284,10 @@ public class SwerveSubsystem extends SubsystemBase {
           yInput = -yInput;
         }
       }
+
       Translation2d inputs = new Translation2d(xInput , yInput);
-      if(boostSupplier.getAsBoolean()){
-        inputs = SwerveMath.scaleTranslation(inputs, 1 * speedMultiplier);
-      }else{
-        inputs = SwerveMath.scaleTranslation(inputs, 0.6 * speedMultiplier);
-      }
+      inputs = SwerveMath.scaleTranslation(inputs, 0.3 * speedMultiplier);
+
       Rotation2d targetAngle;
       if(getPose().getX() > 8){
         targetAngle = getPose().getTranslation().minus(RED_GOAL_CENTER).getAngle();
@@ -284,8 +298,8 @@ public class SwerveSubsystem extends SubsystemBase {
       targetAngle = targetAngle.plus(Rotation2d.k180deg);
       double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), targetAngle.getRadians());
 
-      swerveDrive.drive(new Translation2d(xInput * swerveDrive.getMaximumChassisVelocity(),
-                                          yInput * swerveDrive.getMaximumChassisVelocity()),
+      swerveDrive.drive(new Translation2d(inputs.getX() * swerveDrive.getMaximumChassisVelocity(),
+                                          inputs.getY() * swerveDrive.getMaximumChassisVelocity()),
                         omega,
                         true,
                         false);                 
@@ -383,4 +397,5 @@ public class SwerveSubsystem extends SubsystemBase {
   public void setSpeedMultiplier(double multiplier){
     speedMultiplier = multiplier;
   }
+
 }

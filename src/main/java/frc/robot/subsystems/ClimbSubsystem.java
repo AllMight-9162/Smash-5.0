@@ -20,14 +20,13 @@ public class ClimbSubsystem extends SubsystemBase {
     // Motores do sistema de climb
     private final SparkMax Motor;
 
-    // ID 
     private static final int MOTOR_ID = 15;
 
     // Configurações de PID dos motores
-    private static final PIDConfig CLIMB_PID = new PIDConfig(0, 0, 0);
+    private static final PIDConfig CLIMB_PID = new PIDConfig(0.3, 0, 0);
 
     // Limite de corrente dos motores de climb
-    private static final int CURRENT_LIMIT = 60;
+    private static final int CURRENT_LIMIT = 40;
 
     // Limite de potencia dos motores
     private static final double OUT_MIN = -1.0;
@@ -49,11 +48,10 @@ public class ClimbSubsystem extends SubsystemBase {
             CURRENT_LIMIT,
             OUT_MIN,OUT_MAX,
             CLIMB_GEAR_RATIO,
-            true
+            false
         );
 
         SparkConfigurator.configureRampSparkMax(Motor, 0.1);
-
     }
 
     public void toggleClimb(){
@@ -64,21 +62,22 @@ public class ClimbSubsystem extends SubsystemBase {
         }else{
             climbDown();
         }
-
     }
 
     // Prepara o robô para iniciar o climb
-    private void climbUp() {
-        setPosition(0.3);
+    public void climbUp() {
+        setPosition(1.4);
         
     }
 
     // Reseta o sistema de climb para a posição inicial
-    private void climbDown() {
+    public void climbDown() {
         setPosition(0.0);
-
     }
 
+    public void Init(){
+        Motor.getEncoder().setPosition(0.0);
+    }
     // Define a posição alvo do motor usando controle em malha fechada (PID)
     private void setPosition(double position) {
         Motor.getClosedLoopController().

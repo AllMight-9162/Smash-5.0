@@ -2,10 +2,9 @@ package frc.robot;
 
 import frc.robot.Constants.Controle;
 import frc.robot.commands.AutoCommands;
-import frc.robot.commands.SubsystemsCommands.IntakeCommand;
-import frc.robot.commands.SubsystemsCommands.RetractCommand;
-import frc.robot.commands.SubsystemsCommands.ShooterCommand;
+import frc.robot.commands.SubsystemsCommands.*;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -13,7 +12,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,8 +32,9 @@ public class RobotContainer {
   private final XboxController pilotoSub = new XboxController(1);
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
+  private final ClimbSubsystem climb = new ClimbSubsystem();
 
-  private final AutoCommands autoCommands = new AutoCommands(swerve, shooter, intake);
+  private final AutoCommands autoCommands = new AutoCommands(swerve, shooter, intake, climb);
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
  
@@ -45,9 +44,10 @@ public class RobotContainer {
       () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND),
       () -> controleXbox.getRightX(),
       () -> controleXbox.getRightY(),
-      () -> controleXbox.rightBumper().getAsBoolean()));
+      () -> controleXbox.rightBumper().getAsBoolean(),
+      () -> controleXbox.leftBumper().getAsBoolean()));
 
-      new AutoCommands(swerve, shooter, intake);
+      new AutoCommands(swerve, shooter, intake, climb);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -60,24 +60,33 @@ public class RobotContainer {
       controleXbox.start().onTrue(Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
 
-    controleXbox.a().whileTrue(swerve.driveAlign45(
-    () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-    () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
+    controleXbox.a().whileTrue(swerve.driveAlign0(
+    () -> MathUtil.applyDeadband(-controleXbox.getLeftY(), Constants.Controle.DEADBAND),
+    () -> MathUtil.applyDeadband(-controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
 
-    controleXbox.b().whileTrue(swerve.driveAlignToGoal(
-    () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-    () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND),
-    () -> controleXbox.rightBumper().getAsBoolean()));
+    controleXbox.b().whileTrue(swerve.driveAlign180(
+    () -> MathUtil.applyDeadband(-controleXbox.getLeftY(), Constants.Controle.DEADBAND),
+    () -> MathUtil.applyDeadband(-controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
 
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
     .whileTrue(new IntakeCommand(intake));
 
-    new JoystickButton(pilotoSub, XboxController.Button.kB.value)
+    new JoystickButton(pilotoSub, XboxController.Button.kLeftBumper.value)
     .whileTrue(new RetractCommand(intake));
 
-    new JoystickButton(pilotoSub, XboxController.Button.kY.value)
-    .whileTrue(new ShooterCommand(shooter));
+    new JoystickButton(pilotoSub, XboxController.Button.kX.value)
+    .whileTrue(new ShooterInField(shooter));
 
+    new JoystickButton(pilotoSub, XboxController.Button.kY.value)
+    .whileTrue(new ShooterInHub(shooter));
+
+   new JoystickButton(pilotoSub, XboxController.Button.kY.value)
+    .whileTrue(swerve.driveAlignToHub(
+    () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
+    () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
+
+    //new JoystickButton(pilotoSub, XboxController.Button.kRightBumper.value)
+    //.whileTrue(new ClimbCommand(climb));
   }
 
   public void init() {
@@ -90,14 +99,15 @@ public class RobotContainer {
 
   public void autoInit() {
     intake.Init();
+    climb.Init();
   }
 
   public void teleOpinit() {
-    
+    //intake.Init();
+    //climb.Init();
   }
 
   public void teleOP() {
-  
   }
 
   public Command getAutonomousCommand() {

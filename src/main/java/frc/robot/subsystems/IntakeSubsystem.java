@@ -3,7 +3,6 @@
  */
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Dependências necessárias para o funcionamento do subsistema
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -14,6 +13,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 
 import frc.Java_Is_AllMight.Control.PIDConfig;
 import frc.Java_Is_AllMight.Motors.SparkConfigurator;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @SuppressWarnings("unused")
 // Subsistema do mecanismo do intake
@@ -33,10 +34,10 @@ public class IntakeSubsystem extends SubsystemBase {
     // Configuração de PID do motor de angulação
     private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.75, 0.0003, 0.0001, 0.0, 0.3);
 
-    // Limite de corrente dos motoresS
+    // Limite de corrente dos motores
     private static final int CURRENT_LIMIT = 40;
 
-    // Limite de potencia dos motoresS
+    // Limite de potencia dos motores
     private static final double INTAKE_OUT_MIN = -1.0;
     private static final double INTAKE_OUT_MAX = 1.0;
     private static final double ANGULATE_OUT_MIN = -0.9;
@@ -60,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
             CURRENT_LIMIT,
             INTAKE_OUT_MIN,INTAKE_OUT_MAX,
             INTAKE_GEAR_RATIO,
-            false
+            true
         );
 
         rightIntakeMotor = SparkConfigurator.createSparkMaxFollower(
@@ -68,7 +69,7 @@ public class IntakeSubsystem extends SubsystemBase {
             MotorType.kBrushless,
             IdleMode.kCoast,
             CURRENT_LIMIT,
-            LEFT_INTAKE_MOTOR_ID, true,
+            LEFT_INTAKE_MOTOR_ID, false,
             INTAKE_GEAR_RATIO
         );
 
@@ -93,6 +94,12 @@ public class IntakeSubsystem extends SubsystemBase {
         );
     }
 
+    @Override
+    public void periodic(){
+        double encoder = leftAngulateMotor.getEncoder().getPosition();
+        SmartDashboard.putNumber("Intake position", encoder);
+    }
+
     public void toggleIntake(){
         active = !active;
 
@@ -103,11 +110,6 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    public void periodic(){
-        double encoder = leftAngulateMotor.getEncoder().getPosition();
-        SmartDashboard.putNumber("Intake position", encoder);
-    }
-
     // Recolhe o intake para a posição inicial
     public void retract() {
         stop();
@@ -116,18 +118,17 @@ public class IntakeSubsystem extends SubsystemBase {
     
     public void Init(){
         leftAngulateMotor.getEncoder().setPosition(0.0);
-        angulate(0.3);
         stop();
     }
 
     // Posiciona o intake e inicia a coleta
-    private void take() {
+    public void take() {
         angulate(0.3);
         leftIntakeMotor.set(1.0);
     }
 
     // Para o motor de intake
-    private void stop() {
+    public void stop() {
         leftIntakeMotor.set(0.0);
     }
 
