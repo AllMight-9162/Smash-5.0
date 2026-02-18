@@ -6,7 +6,6 @@ import frc.robot.subsystems.ClimbSubsystem;
 public class ClimbCommand extends Command{
 
     private final ClimbSubsystem climb;
-    public Boolean ClimbAtivo = false;
 
     public ClimbCommand(ClimbSubsystem climb) {
         this.climb = climb;
@@ -16,7 +15,8 @@ public class ClimbCommand extends Command{
 
     @Override
     public void initialize() {
-        climb.climbUp();
+        climb.toggleClimb();
+       
     }
 
     @Override
