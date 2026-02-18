@@ -2,12 +2,17 @@ package frc.Java_Is_AllMight.Motors;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 import frc.Java_Is_AllMight.Control.PIDConfig;
 
@@ -60,6 +65,18 @@ public class SparkConfigurator {
     );
     return motor;
   };
+
+  public static PWMSparkMax createPWMSparkMax(
+    int id,
+    boolean isInverted
+  ) {
+    PWMSparkMax motor = new PWMSparkMax(id);
+
+    motor.setInverted(isInverted);
+    motor.stopMotor();
+
+    return motor;
+  }
 
   public static void configureRampSparkMax(SparkMax motor, double rampRateSeconds) {
     SparkMaxConfig config = new SparkMaxConfig();

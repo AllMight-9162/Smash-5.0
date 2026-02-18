@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -14,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.Java_Is_AllMight.Control.PIDConfig;
@@ -24,11 +24,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private final SwerveSubsystem swerve;
     private final RampSubsystem ramp;
    
-    private final SparkMax  takerMotor;
+    private final PWMSparkMax takerMotor;
     private final SparkFlex shooterMotor;
 
-    private static final int TAKE_ID = 13;
-    private static final int SHOOTER_ID = 14;
+    private static final int TAKE_PWM_ID = 9;
+    private static final int SHOOTER_ID = 13;
 
     private static final int CURRENT_LIMIT = 40;
     
@@ -59,14 +59,8 @@ public class ShooterSubsystem extends SubsystemBase {
         this.swerve = swerve;
         ramp = new RampSubsystem();
 
-        takerMotor = SparkConfigurator.createSparkMax(
-            TAKE_ID,
-            MotorType.kBrushless,
-            null,
-            IdleMode.kCoast,
-            CURRENT_LIMIT,
-            OUTPUT_MIN, OUTPUT_MAX,
-            GEAR_RATIO,
+        takerMotor = SparkConfigurator.createPWMSparkMax(
+            TAKE_PWM_ID,
             false
            );
 
