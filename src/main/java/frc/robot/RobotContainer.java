@@ -16,6 +16,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -94,7 +95,8 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    
+    double matchtime = DriverStation.getMatchTime();
+    SmartDashboard.putString("Match Time", String.format("%.0f", matchtime));
   }
 
   public void autoInit() {

@@ -28,6 +28,11 @@ public class AutoCommands {
             () -> shooter.stop()).
             withTimeout(10.0));
 
+        NamedCommands.registerCommand(
+            "acelerateshooter", Commands.runEnd(
+            () -> shooter.acelerateShooter(), 
+            () -> shooter.stop()).withTimeout(5.0));
+
         NamedCommands.registerCommand("intake", Commands.startEnd(
             () -> intake.take(),
             () -> intake.stop()).

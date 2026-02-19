@@ -119,6 +119,12 @@ public class ShooterSubsystem extends SubsystemBase {
         shoot();
     }
 
+    public void acelerateShooter(){
+        shooterMotor.getClosedLoopController()
+        .setSetpoint(targetRPM, ControlType.kVelocity);
+        ramp.set(0.6);
+    }
+
     public void stop() {
         targetRPM = 0.0;
         shooterMotor.set(0.0);
@@ -127,7 +133,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     private void shoot() {
-
         shooterMotor.getClosedLoopController()
         .setSetpoint(targetRPM, ControlType.kVelocity);
         ramp.set(0.6);
