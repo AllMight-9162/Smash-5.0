@@ -14,11 +14,16 @@ public class RetractCommand extends Command {
 
     @Override
     public void initialize() {
-        intake.retract();
+        intake.retract(); // começa a retrair
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.angleBack(); // volta o intake quando o comando acabar
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false; // 🔥 mantém o comando vivo enquanto o botão estiver true
     }
 }

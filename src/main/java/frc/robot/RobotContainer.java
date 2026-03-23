@@ -4,8 +4,12 @@ import frc.robot.Constants.Controle;
 import frc.robot.commands.AutoCommands;
 import frc.robot.commands.SubsystemsCommands.*;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.RampSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -16,6 +20,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   private SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -34,10 +39,14 @@ public class RobotContainer {
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final ShooterSubsystem shooter = new ShooterSubsystem(swerve);
   private final ClimbSubsystem climb = new ClimbSubsystem();
+  private final RampSubsystem ramp = new RampSubsystem();
 
-  private final AutoCommands autoCommands = new AutoCommands(swerve, shooter, intake, climb);
+
+  private final AutoCommands autoCommands = new AutoCommands(swerve, shooter, intake, climb, ramp);
 
   private CommandXboxController controleXbox = new CommandXboxController(Controle.xboxControle);
+
+  public GenericEntry matchTimeEntry;
  
   public RobotContainer() {
     swerve.setDefaultCommand(swerve.driveCommandAlinharComJoystick(
@@ -48,7 +57,7 @@ public class RobotContainer {
       () -> controleXbox.rightBumper().getAsBoolean(),
       () -> controleXbox.leftBumper().getAsBoolean()));
 
-      new AutoCommands(swerve, shooter, intake, climb);
+      new AutoCommands(swerve, shooter, intake, climb, ramp);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -65,9 +74,9 @@ public class RobotContainer {
     () -> MathUtil.applyDeadband(-controleXbox.getLeftY(), Constants.Controle.DEADBAND),
     () -> MathUtil.applyDeadband(-controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
 
-    controleXbox.b().whileTrue(swerve.driveAlign180(
-    () -> MathUtil.applyDeadband(-controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-    () -> MathUtil.applyDeadband(-controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
+    new Trigger(() -> controleXbox.getLeftTriggerAxis() > 0.5).whileTrue(swerve.driveAlignToHub(
+    () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
+    () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
 
     new JoystickButton(pilotoSub, XboxController.Button.kA.value)
     .whileTrue(new IntakeCommand(intake));
@@ -81,22 +90,30 @@ public class RobotContainer {
     new JoystickButton(pilotoSub, XboxController.Button.kY.value)
     .whileTrue(new ShooterInHub(shooter));
 
-   new JoystickButton(pilotoSub, XboxController.Button.kY.value)
-    .whileTrue(swerve.driveAlignToHub(
-    () -> MathUtil.applyDeadband(controleXbox.getLeftY(), Constants.Controle.DEADBAND),
-    () -> MathUtil.applyDeadband(controleXbox.getLeftX(), Constants.Controle.DEADBAND)));
+    new JoystickButton(pilotoSub, XboxController.Button.kB.value)
+    .whileTrue(new ClimbCommand(climb));
 
-    //new JoystickButton(pilotoSub, XboxController.Button.kRightBumper.value)
-    //.whileTrue(new ClimbCommand(climb));
+    new JoystickButton(pilotoSub, XboxController.Button.kRightBumper.value)
+    .whileTrue(new RampCommand(ramp));
   }
 
   public void init() {
-    
+    ShuffleboardTab tab = Shuffleboard.getTab("Match");
+
+    matchTimeEntry = tab
+        .add("Match Time", 0.0)
+        .withWidget(BuiltInWidgets.kTextView)
+        .getEntry();
   }
 
   public void periodic() {
-    double matchtime = DriverStation.getMatchTime();
-    SmartDashboard.putString("Match Time", String.format("%.0f", matchtime));
+    double time = DriverStation.getMatchTime();
+    
+    if (time < 0) {
+        matchTimeEntry.setDouble(0.0);
+    } else {
+        matchTimeEntry.setDouble(time);
+    }
   }
 
   public void autoInit() {
@@ -105,12 +122,10 @@ public class RobotContainer {
   }
 
   public void teleOpinit() {
-    //intake.Init();
-    //climb.Init();
+    intake.Init();
   }
 
-  public void teleOP() {
-  }
+  public void teleOP() {}
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();

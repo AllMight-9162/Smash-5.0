@@ -60,8 +60,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private double speedMultiplier = 1.0;
     //Constantes 
-    private static final Translation2d BLUE_GOAL_CENTER = new Translation2d(4.625, 4.035);
-    private static final Translation2d RED_GOAL_CENTER = new Translation2d(12, 4);
+    private static final Translation2d BLUE_GOAL_CENTER = new Translation2d(4.625, 4.030);
+    private static final Translation2d RED_GOAL_CENTER = new Translation2d(11.920, 4.030);
 
     // Método construtor da classe
     public SwerveSubsystem(File directory) {
@@ -92,16 +92,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
      LimelightHelpers.SetRobotOrientation(
-        "limelight-front",
+        "limelight",
         getHeading().getDegrees(),
         0,0,0,0,0
       );
-      LimelightHelpers.PoseEstimate mt2 = 
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+      LimelightHelpers.PoseEstimate mt1 = 
+        LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
    
       boolean doRejectUpdate = false;
-      
-
+  
   // se nossa velocidade angular for maior que 360 graus por segundo, ignore atualizações de visão
       if(Math.abs(
         swerveDrive.getGyro()
@@ -110,8 +109,8 @@ public class SwerveSubsystem extends SubsystemBase {
       ) > 180) {
         doRejectUpdate = true;
       }
-
-      if(mt2.tagCount == 0) {
+   
+      if(mt1.tagCount == 0) {
         doRejectUpdate = true;
       }
       if(!doRejectUpdate) {
@@ -119,13 +118,13 @@ public class SwerveSubsystem extends SubsystemBase {
           VecBuilder.fill(.7,.7,9999999)
         );
         swerveDrive.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds
+            mt1.pose,
+            mt1.timestampSeconds
         );
-        poseVisionPublisher.set(mt2.pose);
+        poseVisionPublisher.set(mt1.pose);
       }
-  }
-  
+
+}
       public void setupPathPlanner() {
     // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
@@ -195,27 +194,23 @@ public class SwerveSubsystem extends SubsystemBase {
   {
     return run(() -> {
       swerveDrive.setMotorIdleMode(true);
-      var alliance = DriverStation.getAlliance();
       double xInput = translationX.getAsDouble(); 
       double yInput = translationY.getAsDouble();
       double xHeading = headingX.getAsDouble();
       double yHeading = headingY.getAsDouble();
 
-      if (alliance.isPresent()){
-        if(alliance.get() == Alliance.Blue){
-          xInput = -xInput;
-          yInput = -yInput;
-          xHeading = -headingX.getAsDouble();
-          yHeading = -headingY.getAsDouble();
-        }
-      }
+      xInput = -xInput;
+      yInput = -yInput; 
+      xHeading = -headingX.getAsDouble();
+      yHeading = -headingY.getAsDouble();
+        
       Translation2d inputs = new Translation2d(xInput , yInput);
       if(boostSupplier.getAsBoolean()){
-        inputs = SwerveMath.scaleTranslation(inputs, 1.0 * speedMultiplier);
+        inputs = SwerveMath.scaleTranslation(inputs, 1.4 * speedMultiplier);
       }else if(lowSupplier.getAsBoolean()){
         inputs = SwerveMath.scaleTranslation(inputs, 0.3 * speedMultiplier);
       }else{
-        inputs = SwerveMath.scaleTranslation(inputs, 0.6 * speedMultiplier);
+        inputs = SwerveMath.scaleTranslation(inputs, 0.85 * speedMultiplier);
       }
 
       // Faz o robô se mover
@@ -278,24 +273,21 @@ public class SwerveSubsystem extends SubsystemBase {
       double xInput = translationX.getAsDouble(); 
       double yInput = translationY.getAsDouble();
 
-      if (alliance.isPresent()){
-        if(alliance.get() == Alliance.Blue){
-          xInput = -xInput;
-          yInput = -yInput;
-        }
-      }
+      xInput = -xInput;
+      yInput = -yInput;
 
       Translation2d inputs = new Translation2d(xInput , yInput);
       inputs = SwerveMath.scaleTranslation(inputs, 0.3 * speedMultiplier);
 
       Rotation2d targetAngle;
-      if(getPose().getX() > 8){
+      if(getPose().getX() > 8.2){
         targetAngle = getPose().getTranslation().minus(RED_GOAL_CENTER).getAngle();
         
       }else{
         targetAngle = getPose().getTranslation().minus(BLUE_GOAL_CENTER).getAngle();
+        targetAngle = targetAngle.plus(Rotation2d.k180deg);
       };
-      targetAngle = targetAngle.plus(Rotation2d.k180deg);
+      
       double omega = swerveDrive.swerveController.headingCalculate(this.getHeading().getRadians(), targetAngle.getRadians());
 
       swerveDrive.drive(new Translation2d(inputs.getX() * swerveDrive.getMaximumChassisVelocity(),

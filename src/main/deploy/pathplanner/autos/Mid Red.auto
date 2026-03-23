@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "intatekeReset0"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "Mid Red"
           }
         },
         {
@@ -30,6 +24,12 @@
                 "type": "named",
                 "data": {
                   "name": "shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ramp"
                 }
               }
             ]

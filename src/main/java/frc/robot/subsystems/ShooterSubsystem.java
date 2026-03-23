@@ -22,7 +22,6 @@ import frc.Java_Is_AllMight.Motors.SparkConfigurator;
 public class ShooterSubsystem extends SubsystemBase {
 
     private final SwerveSubsystem swerve;
-    private final RampSubsystem ramp;
    
     private final PWMSparkMax takerMotor;
     private final SparkFlex shooterMotor;
@@ -49,15 +48,25 @@ public class ShooterSubsystem extends SubsystemBase {
     private double targetRPM = 0.0;
     private double distance = 0.0;
 
-    private static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.035);
-    private static final Translation2d RED_HUB = new Translation2d(12.0, 4.0);
+    private static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.030);
+    private static final Translation2d RED_HUB = new Translation2d(11.920, 4.030);
+
+    private static final double BASE_DISTANCE = 0.5;
+    private static final double BASE_RPM = 2200.0;
+    private static final double RPM_PER_METER = 300.0;
+    private static final double MAX_DISTANCE = 6.0;
+    private static final double STEP = 0.5;
+
+    private boolean active = false;
 
     private final InterpolatingDoubleTreeMap rpmTable =
         new InterpolatingDoubleTreeMap();
 
     public ShooterSubsystem(SwerveSubsystem swerve) {
+
         this.swerve = swerve;
-        ramp = new RampSubsystem();
+
+        populateRPMTable();
 
         takerMotor = SparkConfigurator.createPWMSparkMax(
             TAKE_PWM_ID,
@@ -78,20 +87,6 @@ public class ShooterSubsystem extends SubsystemBase {
         SparkConfigurator.configureRampSparkFlex(
             shooterMotor, RAMP_RATE
         );     
-
-        rpmTable.put(0.0, 0.0);
-        rpmTable.put(0.5, 2195.0);
-        rpmTable.put(1.0, 2345.0);
-        rpmTable.put(1.5, 2495.0);
-        rpmTable.put(2.0, 2645.0);
-        rpmTable.put(2.5, 2795.0);
-        rpmTable.put(3.0, 2945.0);
-        rpmTable.put(3.5, 3095.0);
-        rpmTable.put(4.0, 3245.0);
-        rpmTable.put(4.5, 3395.0);
-        rpmTable.put(5.0, 3545.0);
-        rpmTable.put(5.5, 3695.0);
-        rpmTable.put(6.0, 3845.0);
     }
 
     @Override
@@ -107,10 +102,21 @@ public class ShooterSubsystem extends SubsystemBase {
             getRPM());
         SmartDashboard.putBoolean("At speed", 
             atSpeed());
+        SmartDashboard.putBoolean("RampActive",
+            active);
+    }
+
+    private void populateRPMTable() {
+        rpmTable.put(0.0, 0.0);
+
+        for (double distance = BASE_DISTANCE; distance <= MAX_DISTANCE; distance += STEP) {
+            double rpm = BASE_RPM + (distance - BASE_DISTANCE) * RPM_PER_METER;
+            rpmTable.put(distance, rpm);
+        }
     }
 
     public void shootInField(){
-        targetRPM = 1500;
+        targetRPM = 2275;
         shoot();
     }
 
@@ -119,24 +125,16 @@ public class ShooterSubsystem extends SubsystemBase {
         shoot();
     }
 
-    public void acelerateShooter(){
-        shooterMotor.getClosedLoopController()
-        .setSetpoint(targetRPM, ControlType.kVelocity);
-        ramp.set(0.6);
-    }
-
     public void stop() {
         targetRPM = 0.0;
         shooterMotor.set(0.0);
         takerMotor.set(0.0);
-        ramp.stop();
+        
     }
 
     private void shoot() {
         shooterMotor.getClosedLoopController()
         .setSetpoint(targetRPM, ControlType.kVelocity);
-        ramp.set(0.6);
-
         if (atSpeed()) {
          takerMotor.set(0.9);
         } 
@@ -156,7 +154,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .getDistance(getHubPosition());
     }
 
-    private Translation2d getHubPosition() {
+     private Translation2d getHubPosition() {
         return DriverStation.getAlliance()
             .filter(a -> a == Alliance.Red)
             .map(a -> RED_HUB)

@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final int RIGHT_INTAKE_MOTOR_ID = 12;
     
     // Configuração de PID do motor de angulação
-    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.75, 0.0003, 0.0001, 0.0, 0.3);
+    private static final PIDConfig ANGULATE_PID  = new PIDConfig(0.8, 0.0003, 0.0001, 0.0, 0.3);
 
     // Limite de corrente dos motores
     private static final int CURRENT_LIMIT = 40;
@@ -37,8 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
     // Limite de potencia dos motores
     private static final double INTAKE_OUT_MIN = -1.0;
     private static final double INTAKE_OUT_MAX = 1.0;
-    private static final double ANGULATE_OUT_MIN = -0.9;
-    private static final double ANGULATE_OUT_MAX = 0.7;
+    private static final double ANGULATE_OUT_MIN = -1;
+    private static final double ANGULATE_OUT_MAX = 0.60;
 
     // Redução dos motores
     private static final double INTAKE_GEAR_RATIO = 15;
@@ -61,13 +61,15 @@ public class IntakeSubsystem extends SubsystemBase {
             true
         );
 
-        rightIntakeMotor = SparkConfigurator.createSparkMaxFollower(
+        rightIntakeMotor = SparkConfigurator.createSparkMax(
             RIGHT_INTAKE_MOTOR_ID,
             MotorType.kBrushless,
+            null,
             IdleMode.kCoast,
             CURRENT_LIMIT,
-            LEFT_INTAKE_MOTOR_ID, false,
-            INTAKE_GEAR_RATIO
+            INTAKE_OUT_MIN,INTAKE_OUT_MAX,
+            INTAKE_GEAR_RATIO,
+            true
         );
 
         leftAngulateMotor = SparkConfigurator.createSparkMax(
@@ -95,6 +97,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic(){
         double encoder = leftAngulateMotor.getEncoder().getPosition();
         SmartDashboard.putNumber("Intake position", encoder);
+
+        SmartDashboard.putBoolean("intake ativo", active);
     }
 
     public void toggleIntake(){
@@ -112,6 +116,10 @@ public class IntakeSubsystem extends SubsystemBase {
         stop();
         angulate(0.0);
     }
+
+    public void angleBack(){
+        angulate(0.3205);
+    }
     
     public void Init(){
         leftAngulateMotor.getEncoder().setPosition(0.0);
@@ -120,12 +128,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // Posiciona o intake e inicia a coleta
     public void take() {
-        angulate(0.3);
+        angulate(0.33);
         leftIntakeMotor.set(1.0);
+        rightIntakeMotor.set(0.4);
     }
 
     // Para o motor de intake
     public void stop() {
+        leftAngulateMotor.set(0.0);
+        rightIntakeMotor.set(0.0);
         leftIntakeMotor.set(0.0);
     }
 
@@ -133,6 +144,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private void angulate(double set) {
         leftAngulateMotor.getClosedLoopController()
         .setSetpoint(set, ControlType.kPosition);
+        
     }
 }
 
