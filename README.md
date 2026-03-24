@@ -1,5 +1,9 @@
 # SMASH 5.0 — FRC 9162
 
+<p align="center">
+  <img src="Smash5.0.jpeg" width="1000">
+</p>
+
 Codebase for **SMASH 5.0**, the development and training robot developed by **Team ALLMIGHT — 9162**.  
 This version focuses on **vision-based shooting system using Limelight for distance estimation and linear interpolation to dynamically adjust shooter RPM **.
 
