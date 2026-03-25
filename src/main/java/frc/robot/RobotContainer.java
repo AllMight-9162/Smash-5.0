@@ -122,7 +122,7 @@ public class RobotContainer {
   }
 
   public void teleOpinit() {
-    intake.Init();
+    //intake.Init();
   }
 
   public void teleOP() {}
