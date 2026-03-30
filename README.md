@@ -5,7 +5,7 @@
 </p>
 
 Codebase for **SMASH 5.0**, the development and training robot developed by **Team ALLMIGHT — 9162**.  
-This version focuses on **vision-based shooting system using Limelight for distance estimation and linear interpolation to dynamically adjust shooter RPM **.
+This version focuses on **vision-based shooting system using Limelight for distance estimation and linear interpolation to dynamically adjust shooter RPM**.
 
 ---
 
